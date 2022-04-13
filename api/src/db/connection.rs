@@ -1,14 +1,24 @@
-use dotenv::dotenv;
-use std::env;
-use diesel::prelude::*;
-use diesel::pg::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool as R2Pool, PooledConnection};
+use std::ops::Deref;
+use rocket::http::Status;
+use rocket::request::{self, FromRequest, Outcome};
+use rocket::{Request, State};
 
-pub fn create() -> PgConnection {
-    dotenv().ok();
+type DbType = diesel::pg::PgConnection;
 
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
+type Pool = R2Pool<ConnectionManager<DbType>>;
+type PoolConn = PooledConnection<ConnectionManager<DbType>>;
 
-    PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
+pub struct DbConn(pub PoolConn);
+
+impl Deref for DbConn {
+    type Target = DbType;
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+// TODO -- implement FromRequest for DbConn
+
+pub fn init(database_url: &str) -> Pool {
+    let manager = ConnectionManager::<DbType>::new(database_url);
+    R2Pool::new(manager).expect("db pool")
 }

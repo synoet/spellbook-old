@@ -1,3 +1,4 @@
+use serde_derive::{Deserialize, Serialize};
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use chrono::NaiveDateTime;
@@ -5,6 +6,7 @@ use chrono::NaiveDateTime;
 use crate::db::schema::commands;
 
 #[derive(Queryable, Insertable, AsChangeset, Debug)]
+#[derive(Serialize, Deserialize)]
 pub struct Command {
     pub uuid: String,
     pub created_at: NaiveDateTime,
@@ -36,6 +38,10 @@ impl Command {
 
     pub fn read(connection: &PgConnection) -> Vec<Command> {
         commands::table.order(commands::uuid).load::<Command>(connection).unwrap()
+    }
+
+    pub fn get(uuid: &str, connection: &PgConnection) -> Command {
+        commands::table.find(uuid).first(connection).unwrap()
     }
 
     pub fn delete(uuid: String, connection: &PgConnection) -> bool {
