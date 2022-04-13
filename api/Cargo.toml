@@ -9,8 +9,9 @@ edition = "2021"
 rocket = { version = "0.5.0-rc.1", features=["json"]}
 rocket_codegen = "0.4.5"
 rocket_contrib = "0.4.5"
-diesel = { version = "1.4.4", features = ["postgres"] }
+diesel = { version = "1.4.4", features = ["postgres", "chrono"] }
 dotenv = "0.15.0"
 serde = "1.0.116"
 serde_derive = "1.0.116"
 serde_json = "1.0.58"
+chrono = { version = "0.4.19", features = ["clock", "serde"], default-features = false }

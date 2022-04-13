@@ -1,10 +1,8 @@
 #[macro_use] extern crate rocket;
 #[macro_use] extern crate diesel;
 
-mod models;
 mod db;
-
-use crate::db::connection::create;
+mod api;
 
 #[get("/")]
 fn index() -> &'static str {
