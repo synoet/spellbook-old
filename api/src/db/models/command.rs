@@ -4,7 +4,7 @@ use chrono::NaiveDateTime;
 
 use crate::db::schema::commands;
 
-#[derive(Queryable, Insertable, AsChangeset)]
+#[derive(Queryable, Insertable, AsChangeset, Debug)]
 pub struct Command {
     pub uuid: String,
     pub created_at: NaiveDateTime,
@@ -29,7 +29,7 @@ impl Command {
         diesel::update(commands::table.find(command.uuid))
             .set(&command)
             .get_result::<Command>(connection)
-            .expect("Error updating new command");
+            .expect("Error updating command");
 
         commands::table.find(command.uuid).first(connection).unwrap()
     }
