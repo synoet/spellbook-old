@@ -1,5 +1,3 @@
-use super::schema::commands;
+fn main() {
 
-fn rocket() -> _ {
-    rocket::build().mount("/", routes![get_command])
 }

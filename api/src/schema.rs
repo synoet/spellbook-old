@@ -1,6 +1,6 @@
 table! {
     commands (id) {
-        id -> Nullable<Integer>,
+        id -> Int4,
         command -> Text,
         label -> Text,
     }
