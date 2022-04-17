@@ -1,2 +1,3 @@
-/api/target
+/api/node_modules
 /api/.env
+
