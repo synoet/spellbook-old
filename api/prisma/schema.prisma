@@ -14,8 +14,6 @@ model Command {
   labels      String[]
   createdAt   DateTime @default(now()) 
   updatedAt   DateTime @updatedAt
-  book        Book? @relation(fields: [bookId], references: [id])
-  bookId      String
 }
 
 model Book {
@@ -24,6 +22,5 @@ model Book {
   description String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
-  commands    Command[]
   labels      String[]
 }
