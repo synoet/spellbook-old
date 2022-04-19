@@ -5,11 +5,12 @@ import {
 } from 'fastify';
 
 import {Command} from '@prisma/client';
+import {CommandService} from '../services/command.service';
 
 export default async (app: FastifyInstance,  service: CommandService) => {
   // get all commands
   app.get("/commands", async (_: FastifyRequest, reply: FastifyReply) => {
-    const commands = await CommandService.getAll().catch((err: any) => {
+    const commands = await service.getAll().catch((err: any) => {
       reply.status(500).send({
         error: err.message,
       });
@@ -31,7 +32,7 @@ export default async (app: FastifyInstance,  service: CommandService) => {
         error: "No id provided",
       });
     }
-    const command = await CommandService.get(request.params.id).catch((err: any) => {
+    const command = await service.get(request.params.id).catch((err: any) => {
       reply.status(500).send({
         error: err.message,
       });
@@ -56,7 +57,7 @@ export default async (app: FastifyInstance,  service: CommandService) => {
       });
     }
 
-    const newCommand = await CommandService.create(command).catch(err => {
+    const newCommand = await service.create(command).catch((err: any) => {
       reply.status(500).send({
         error: err.message,
       });
@@ -75,7 +76,7 @@ export default async (app: FastifyInstance,  service: CommandService) => {
       });
     }
 
-    const updatedCommand = await CommandService.update(command).catch(err => {
+    const updatedCommand = await service.update(command).catch((err: any) => {
       reply.status(500).send({
         error: err.message,
       });
