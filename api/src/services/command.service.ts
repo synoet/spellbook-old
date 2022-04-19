@@ -57,4 +57,14 @@ export class CommandService {
       }
     });
   }
+
+  async search(query: string): Promise<Array<Command>> {
+    return await this.prisma.command.findMany({
+      where: {
+        description: {
+          search: query,
+        },
+      },
+    });
+  }
 }

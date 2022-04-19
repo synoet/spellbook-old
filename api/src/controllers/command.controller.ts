@@ -85,4 +85,31 @@ export default async (app: FastifyInstance,  service: CommandService) => {
     reply.status(200).send(updatedCommand);
   });
 
+  interface IQuery {
+    q: string,
+  }
+
+  app.get<{ Querystring: IQuery}>("/commands/search", async (request: FastifyRequest, reply: FastifyReply) => {
+    const { q } = request?.query as IQuery;
+    
+    if (!q) {
+      reply.status(400).send({
+        error: "No query provided",
+      });
+    }
+    const commands = await service.search(q).catch((err: any) => {
+      reply.status(500).send({
+        error: err.message,
+      });
+    });
+
+    if (!commands) {
+      reply.status(404).send({
+        error: "No commands found",
+      });
+    }
+
+    reply.status(200).send(commands);
+  });
+
 }
