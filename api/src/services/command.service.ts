@@ -1,6 +1,8 @@
 import {PrismaClient, Command} from '@prisma/client'
 import cuid from 'cuid'
 
+import {stringRankSearch} from '../utils/search';
+
 export class CommandService {
   prisma: PrismaClient;
 
@@ -59,12 +61,6 @@ export class CommandService {
   }
 
   async search(query: string): Promise<Array<Command>> {
-    return await this.prisma.command.findMany({
-      where: {
-        description: {
-          search: query,
-        },
-      },
-    });
+    return stringRankSearch(query, await this.getAll());
   }
 }
