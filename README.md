@@ -7,7 +7,7 @@
 - [ ] validation
 - [ ] logging
 
-### CLI
+### CLI / TUI
 - [ ] search commands from api db
 - [ ] save online commands locally
 - [ ] create new commands
