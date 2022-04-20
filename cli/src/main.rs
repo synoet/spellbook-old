@@ -11,11 +11,11 @@ use std::time::{Duration, Instant};
 use thiserror::Error;
 use tui::{
     backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Direction, Layout},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Span, Spans},
     widgets::{
-        Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs,
+        Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs, Clear,
     },
     Terminal,
 };
@@ -48,6 +48,12 @@ enum Event<I> {
 #[derive(Copy, Clone, Debug)]
 enum MenuItem {
     LocalCommands,
+}
+
+#[derive(Copy, Clone, Debug)]
+enum Popup {
+    AddCommand,
+    None,
 }
 
 impl From<MenuItem> for usize {
@@ -89,6 +95,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let menu_titles = vec!["Local Commands", "Installer", "Help"];
     let mut active_menu_item = MenuItem::LocalCommands;
+    let mut active_popup = Popup::None;
     let mut command_state = ListState::default();
     command_state.select(Some(0));
 
@@ -154,6 +161,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     rect.render_widget(right, commands_chunks[1]);
                 }
             }
+
+            match active_popup {
+                Popup::AddCommand => {
+                    let block = Block::default().title("Add Command").borders(Borders::ALL);
+                    let area = centered_rect(40, 20, size);
+                    rect.render_widget(Clear, area);
+                    rect.render_widget(block, area);
+                }
+                _ => {
+                    
+                }
+            }
             rect.render_widget(branding, chunks[2]);
         })?;
 
@@ -163,6 +182,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     disable_raw_mode()?;
                     terminal.show_cursor()?;
                     break;
+                }
+                KeyCode::Char('/') => {
+                    match active_popup {
+                        Popup::None => {
+                            active_popup = Popup::AddCommand;
+                        }
+                        Popup::AddCommand => {
+                            active_popup = Popup::None;
+                        }
+                    }
                 }
                 KeyCode::Char('l') => active_menu_item = MenuItem::LocalCommands,
                 KeyCode::Down => {
@@ -195,7 +224,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn render_commands<'a>(pet_list_state: &ListState) -> (List<'a>, Table<'a>) {
+fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(
+            [
+                Constraint::Percentage((100 - percent_y)/2),
+                Constraint::Percentage(percent_y),
+                Constraint::Percentage((100 - percent_y)/2),
+
+            ]
+            .as_ref(),
+        )
+        .split(r);
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(
+            [
+                Constraint::Percentage((100 - percent_x)/ 2),
+                Constraint::Percentage(percent_x),
+                Constraint::Percentage((100 - percent_x)/2),
+            ]
+            .as_ref(),
+        )
+        .split(popup_layout[1])[1]
+}
+
+fn render_commands<'a>(command_state: &ListState) -> (List<'a>, Table<'a>) {
     let commands = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
@@ -215,7 +270,7 @@ fn render_commands<'a>(pet_list_state: &ListState) -> (List<'a>, Table<'a>) {
 
     let selected_command = command_list
         .get(
-            pet_list_state
+            command_state
                 .selected()
                 .expect(""),
         )
