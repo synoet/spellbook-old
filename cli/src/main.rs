@@ -174,7 +174,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             [Constraint::Percentage(40), Constraint::Percentage(60)].as_ref(),
                         )
                         .split(chunks[2]);
-                    let (left, right) = render_commands(&command_state, &input_mode, search_query.as_str());
+                    let (left, right) = render_commands(&command_state, search_query.as_str());
                     rect.render_stateful_widget(left, commands_chunks[0], &mut command_state);
                     rect.render_widget(right, commands_chunks[1]);
                 }
@@ -285,7 +285,7 @@ fn command_rank_sort(commands: Vec<LocalCommand>, query: &str) -> Vec<LocalComma
     ranked_commands.iter().map(|rc| rc.command.to_owned()).collect()
 }
 
-fn render_commands<'a>(command_state: &ListState, mode: &InputMode, query: &str) -> (List<'a>, Table<'a>) {
+fn render_commands<'a>(command_state: &ListState,  query: &str) -> (List<'a>, Table<'a>) {
     let commands = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
@@ -294,10 +294,7 @@ fn render_commands<'a>(command_state: &ListState, mode: &InputMode, query: &str)
 
     let command_list_raw = read_db().expect("can fetch command list");
 
-    let command_list: Vec<LocalCommand> = match mode {
-        InputMode::Normal => command_list_raw,
-        InputMode::Insert => command_rank_sort(command_list_raw, query)
-    };
+    let command_list = command_rank_sort(command_list_raw, query);
 
     let items: Vec<_> = command_list
         .iter()
