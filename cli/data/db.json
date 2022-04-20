@@ -1,13 +1,68 @@
 [
   {
-    "id": "test",
-    "content": "test command --test",
-    "description": "test command",
+    "id": "a",
+    "content": "kubectl get pods --namespace=<namespace>",
+    "description": "kubernetes get all pods in a namespace",
     "labels": [
-      "test",
-      "command"
+      "kubectl",
+      "kubernetes",
+      "pods",
+      "namespace"
     ],
     "created_at": "2020-01-01T00:00:00.000Z",
     "updated_at": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "b",
+    "content": "kubectl get pvc --namespace=<namespace>",
+    "description": "get all pvc for a namespace in kubectl",
+    "labels": [
+      "kubectl",
+      "pvc",
+      "namespace",
+      "volume"
+    ],
+    "created_at": "2020-01-01T00:00:00.000Z",
+    "updated_at": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "c",
+    "content": "docker build . -t <image_name>:<image_tag>",
+    "description": "docker build an image from a docker file in the current directory with a name and tag",
+    "labels": [
+      "docker",
+      "image",
+      "tag",
+      "build"
+    ],
+    "created_at": "2020-01-01t00:00:00.000z",
+    "updated_at": "2020-01-01t00:00:00.000z"
+  },
+  {
+    "id": "d",
+    "content": "docker run -it -p 8080:8080 <image_name>:<image_tag>",
+    "description": "docker run a container with an image in interactive mode with a name and tag for a certain port map",
+    "labels": [
+      "docker",
+      "image",
+      "run",
+      "interactive",
+      "port"
+    ],
+    "created_at": "2020-01-01t00:00:00.000z",
+    "updated_at": "2020-01-01t00:00:00.000z"
+  },
+  {
+    "id": "e",
+    "content": "doctl registry get",
+    "description": "doctl get your current registry",
+    "labels": [
+      "doctl",
+      "digital ocean",
+      "registry",
+      "get"
+    ],
+    "created_at": "2020-01-01t00:00:00.000z",
+    "updated_at": "2020-01-01t00:00:00.000z"
   }
 ]
