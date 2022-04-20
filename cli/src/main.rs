@@ -174,7 +174,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             [Constraint::Percentage(40), Constraint::Percentage(60)].as_ref(),
                         )
                         .split(chunks[2]);
-                    let (left, right) = render_commands(&command_state);
+                    let (left, right) = render_commands(&command_state, &input_mode, search_query.as_str());
                     rect.render_stateful_widget(left, commands_chunks[0], &mut command_state);
                     rect.render_widget(right, commands_chunks[1]);
                 }
@@ -282,14 +282,49 @@ fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
         .split(popup_layout[1])[1]
 }
 
-fn render_commands<'a>(command_state: &ListState) -> (List<'a>, Table<'a>) {
+fn command_rank_sort(commands: Vec<LocalCommand>, query: &str) -> Vec<LocalCommand> {
+    struct RankedCommand {
+        command: LocalCommand,
+        rank: usize
+    }
+
+    let lower_query = query.to_lowercase();
+
+    let query_tags: Vec<&str> = lower_query.split(" ").collect();
+
+    let mut ranked_commands: Vec<RankedCommand> = commands.iter().map(|c| {
+        let description_words: Vec<String> = c.description.split(" ").map(|s| String::from(s)).collect();
+        let content_words: Vec<String> = c.content.split(" ").map(|s| String::from(s)).collect();
+
+        let label_rank = c.labels.iter().filter(|l| query_tags.contains(&l.as_str())).count();
+        let description_rank = description_words.iter().filter(|d| query_tags.contains(&d.as_str())).count();
+        let content_rank = content_words.iter().filter(|c| query_tags.contains(&c.as_str())).count();
+
+        RankedCommand {
+            command: c.to_owned(),
+            rank: label_rank + description_rank + content_rank, 
+        }
+    }).collect::<Vec<RankedCommand>>();
+
+    ranked_commands.sort_by(|a, b| b.rank.cmp(&a.rank));
+
+    ranked_commands.iter().map(|rc| rc.command.to_owned()).collect()
+}
+
+fn render_commands<'a>(command_state: &ListState, mode: &InputMode, query: &str) -> (List<'a>, Table<'a>) {
     let commands = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
         .title("Local Commands")
         .border_type(BorderType::Plain);
 
-    let command_list = read_db().expect("can fetch command list");
+    let command_list_raw = read_db().expect("can fetch command list");
+
+    let command_list: Vec<LocalCommand> = match mode {
+        InputMode::Normal => command_list_raw,
+        InputMode::Insert => command_rank_sort(command_list_raw, query)
+    };
+
     let items: Vec<_> = command_list
         .iter()
         .map(|command| {
