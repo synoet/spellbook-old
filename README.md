@@ -9,7 +9,7 @@
 ### CLI / TUI
 - [ ] create a new command (with labels and descriptions)
 - [x] search for commands (by label and descriptions)
-- [ ] store commands locally 
+- [x] store commands locally 
 - [ ] authenticate github sso
 - [ ] sync commands with cloud
 - [ ] search commands from cloud
