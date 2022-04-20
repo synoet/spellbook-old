@@ -50,6 +50,7 @@ dependencies = [
  "serde_json",
  "thiserror",
  "tui",
+ "unicode-width",
 ]
 
 [[package]]

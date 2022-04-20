@@ -20,6 +20,8 @@ use tui::{
     Terminal,
 };
 
+use unicode_width::UnicodeWidthStr;
+
 const DB_PATH: &str = "./data/db.json";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -54,6 +56,12 @@ enum MenuItem {
 enum Popup {
     AddCommand,
     None,
+}
+
+#[derive(Copy, Clone, Debug)]
+enum InputMode {
+    Normal,
+    Insert
 }
 
 impl From<MenuItem> for usize {
@@ -95,6 +103,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     let menu_titles = vec!["Local Commands", "Installer", "Help"];
     let mut active_menu_item = MenuItem::LocalCommands;
+    let mut search_query = String::new();
+    let mut input_mode =  InputMode::Normal;
     let mut active_popup = Popup::None;
     let mut command_state = ListState::default();
     command_state.select(Some(0));
@@ -106,6 +116,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .direction(Direction::Vertical)
                 .margin(2)
                 .constraints([
+                    Constraint::Length(3),
                     Constraint::Length(3),
                     Constraint::Min(2),
                     Constraint::Length(3),
@@ -129,6 +140,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     ])
                 })
                 .collect();
+
             let tabs = Tabs::new(menu)
                 .select(active_menu_item.into())
                 .block(Block::default().title("Menu").borders(Borders::ALL))
@@ -138,8 +150,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             rect.render_widget(tabs, chunks[0]);
 
+            let search = Paragraph::new(search_query.as_ref())
+                .style(match input_mode {
+                    InputMode::Normal => Style::default(),
+                    InputMode::Insert => Style::default().fg(Color::Yellow),
+                })
+                .block(Block::default().borders(Borders::ALL).title("Search"));
 
-           let branding = Paragraph::new("  spellbook v0.1.0")
+            let branding = Paragraph::new("  spellbook v0.1.0")
                 .style(Style::default().fg(Color::Yellow))
                 .alignment(Alignment::Center)
                 .block(
@@ -155,68 +173,82 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .constraints(
                             [Constraint::Percentage(20), Constraint::Percentage(90)].as_ref(),
                         )
-                        .split(chunks[1]);
+                        .split(chunks[2]);
                     let (left, right) = render_commands(&command_state);
                     rect.render_stateful_widget(left, commands_chunks[0], &mut command_state);
                     rect.render_widget(right, commands_chunks[1]);
                 }
             }
 
-            match active_popup {
-                Popup::AddCommand => {
-                    let block = Block::default().title("Add Command").borders(Borders::ALL);
-                    let area = centered_rect(40, 20, size);
-                    rect.render_widget(Clear, area);
-                    rect.render_widget(block, area);
-                }
-                _ => {
-                    
+            match input_mode {
+                InputMode::Normal => {}
+                InputMode::Insert => {
+                    rect.set_cursor(
+                        chunks[1].x + search_query.width() as u16 + 1,
+                        chunks[1].y + 1,
+                    )
+
                 }
             }
-            rect.render_widget(branding, chunks[2]);
+            rect.render_widget(search, chunks[1]);
+            rect.render_widget(branding, chunks[3]);
         })?;
 
+
         match rx.recv()? {
-            Event::Input(event) => match event.code {
-                KeyCode::Char('q') => {
-                    disable_raw_mode()?;
-                    terminal.show_cursor()?;
-                    break;
-                }
-                KeyCode::Char('/') => {
-                    match active_popup {
-                        Popup::None => {
-                            active_popup = Popup::AddCommand;
-                        }
-                        Popup::AddCommand => {
-                            active_popup = Popup::None;
+            Event::Input(event) => match input_mode {
+                InputMode::Normal => match event.code {
+                    KeyCode::Char('q') => {
+                        disable_raw_mode()?;
+                        terminal.show_cursor()?;
+                        break;
+                    }
+                    KeyCode::Char('/') => {
+                        match input_mode {
+                            InputMode::Normal => {
+                                input_mode = InputMode::Insert;
+                            }
+                            InputMode::Insert => {
+                                input_mode = InputMode::Normal;
+                            }
                         }
                     }
-                }
-                KeyCode::Char('l') => active_menu_item = MenuItem::LocalCommands,
-                KeyCode::Down => {
-                    if let Some(selected) = command_state.selected() {
-                        let amount_commands = read_db().expect("can fetch command list").len();
-                        if selected >= amount_commands - 1 {
-                            command_state.select(Some(0));
-                        } else {
-                            command_state.select(Some(selected + 1));
+                    KeyCode::Down => {
+                        if let Some(selected) = command_state.selected() {
+                            let amount_commands = read_db().expect("can fetch command list").len();
+                            if selected >= amount_commands - 1 {
+                                command_state.select(Some(0));
+                            } else {
+                                command_state.select(Some(selected + 1));
+                            }
                         }
                     }
-                }
-                KeyCode::Up => {
-                    if let Some(selected) = command_state.selected() {
-                        let amount_commands = read_db().expect("can fetch command list").len();
-                        if selected > 0 {
-                            command_state.select(Some(selected - 1));
-                        } else {
-                            command_state.select(Some(amount_commands - 1));
+                    KeyCode::Up => {
+                        if let Some(selected) = command_state.selected() {
+                            let amount_commands = read_db().expect("can fetch command list").len();
+                            if selected > 0 {
+                                command_state.select(Some(selected - 1));
+                            } else {
+                                command_state.select(Some(amount_commands - 1));
+                            }
                         }
                     }
+                    _ => {}
                 }
-                _ => {}
-            },
-            Event::Tick => {}
+                InputMode::Insert => match event.code {
+                    KeyCode::Char(c) => {
+                        search_query.push(c);
+                    }
+                    KeyCode::Backspace => {
+                        search_query.pop();
+                    }
+                    KeyCode::Esc => {
+                        input_mode = InputMode::Normal
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
         }
 
     }
