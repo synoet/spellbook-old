@@ -51,12 +51,6 @@ export default async (app: FastifyInstance,  service: CommandService) => {
   app.post<{ Body: Partial<Command> }>("/commands/create", async (request: FastifyRequest, reply: FastifyReply) => {
     const command  = request.body as Partial<Command>;
 
-    if (!command.content || !command.labels) {
-      reply.status(400).send({
-        error: "Command fields: content, labels are required",
-      });
-    }
-
     const newCommand = await service.create(command).catch((err: any) => {
       reply.status(500).send({
         error: err.message,
