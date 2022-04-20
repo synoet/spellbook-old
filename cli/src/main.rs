@@ -351,35 +351,25 @@ fn render_commands<'a>(command_state: &ListState, mode: &InputMode, query: &str)
             .add_modifier(Modifier::BOLD),
     );
 
-    let command_details = Table::new(vec![Row::new(vec![
-        Cell::from(Span::raw(selected_command.id.to_string())),
-        Cell::from(Span::raw(selected_command.content)),
-        Cell::from(Span::raw(selected_command.description)),
-        Cell::from(Span::raw("labels".to_string())),
-        Cell::from(Span::raw(selected_command.created_at.to_string())),
-    ])])
-    .header(Row::new(vec![
-        Cell::from(Span::styled(
-            "ID",
-            Style::default().add_modifier(Modifier::BOLD),
-        )),
-        Cell::from(Span::styled(
-            "Content",
-            Style::default().add_modifier(Modifier::BOLD),
-        )),
-        Cell::from(Span::styled(
-            "Description",
-            Style::default().add_modifier(Modifier::BOLD),
-        )),
-        Cell::from(Span::styled(
-            "Labels",
-            Style::default().add_modifier(Modifier::BOLD),
-        )),
-        Cell::from(Span::styled(
-            "Created At",
-            Style::default().add_modifier(Modifier::BOLD),
-        )),
-    ]))
+    let command_details = Table::new(vec![
+        Row::new(vec![
+            Span::styled("Id:", Style::default().add_modifier(Modifier::BOLD)),
+            Span::styled(selected_command.id.to_string(), Style::default())
+        ]).height(2),
+        Row::new(vec![
+            Span::styled("Command:", Style::default().add_modifier(Modifier::BOLD)),
+            Span::styled(format!("  {}  ", selected_command.content.to_string()),
+                Style::default().bg(Color::Yellow).fg(Color::Black).add_modifier(Modifier::BOLD)),
+        ]).height(2),
+        Row::new(vec![
+            Span::styled("Description:", Style::default().add_modifier(Modifier::BOLD)),
+            Span::styled(selected_command.description.to_string(), Style::default())
+        ]).height(2),
+        Row::new(vec![
+            Span::styled("Labels:", Style::default().add_modifier(Modifier::BOLD)),
+            Span::styled(format!("{:?}", selected_command.labels), Style::default())
+        ]).height(2)
+    ])
     .block(
         Block::default()
             .borders(Borders::ALL)
@@ -388,11 +378,8 @@ fn render_commands<'a>(command_state: &ListState, mode: &InputMode, query: &str)
             .border_type(BorderType::Plain),
     )
     .widths(&[
-        Constraint::Percentage(5),
-        Constraint::Percentage(20),
-        Constraint::Percentage(20),
-        Constraint::Percentage(5),
-        Constraint::Percentage(20),
+        Constraint::Percentage(10),
+        Constraint::Percentage(90),
     ]);
 
     (list, command_details)
