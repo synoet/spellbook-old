@@ -171,7 +171,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let commands_chunks = Layout::default()
                         .direction(Direction::Horizontal)
                         .constraints(
-                            [Constraint::Percentage(20), Constraint::Percentage(90)].as_ref(),
+                            [Constraint::Percentage(40), Constraint::Percentage(60)].as_ref(),
                         )
                         .split(chunks[2]);
                     let (left, right) = render_commands(&command_state);
