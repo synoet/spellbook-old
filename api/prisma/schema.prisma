@@ -23,9 +23,9 @@ model Command {
   createdAt   DateTime @default(now()) 
   updatedAt   DateTime @updatedAt
   author      User?    @relation(fields: [authorId], references: [id])
-  authorId    String
-  book        Book    @relation(fields: [bookId], references: [id])
-  bookId      String
+  authorId    String?
+  book        Book?     @relation(fields: [bookId], references: [id])
+  bookId      String?   
 }
 
 model Book {
@@ -37,6 +37,6 @@ model Book {
   labels      String[]
   commands    Command[]
   author      User?    @relation(fields: [authorId], references: [id])
-  authorId    String
+  authorId    String?
 }
 
