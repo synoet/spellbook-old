@@ -8,13 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id          String @id @unique
+  email       String @unique
+  commands    Command[]
+  books       Book[]
+}
+
 model Command {
-  id          String @id @unique 
+  id          String   @id @unique 
   content     String
   description String
   labels      String[]
   createdAt   DateTime @default(now()) 
   updatedAt   DateTime @updatedAt
+  author      User?    @relation(fields: [authorId], references: [id])
+  authorId    String
 }
 
 model Book {
@@ -24,4 +33,7 @@ model Book {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now())
   labels      String[]
+  author      User?    @relation(fields: [authorId], references: [id])
+  authorId    String
 }
+
