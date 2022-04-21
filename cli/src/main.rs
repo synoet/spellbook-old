@@ -22,10 +22,12 @@ use tui::{
 
 use unicode_width::UnicodeWidthStr;
 
+mod app;
+
 const DB_PATH: &str = "./data/db.json";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct LocalCommand {
+pub struct LocalCommand {
     id: String,
     content: String,
     description: String,
@@ -191,6 +193,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             rect.render_widget(search, chunks[1]);
+    Sync,
             rect.render_widget(branding, chunks[3]);
         })?;
 
@@ -201,6 +204,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     KeyCode::Char('q') => {
                         disable_raw_mode()?;
                         terminal.show_cursor()?;
+                        terminal.clear()?;
                         break;
                     }
                     KeyCode::Char('/') => {
@@ -242,7 +246,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     KeyCode::Backspace => {
                         search_query.pop();
                     }
-                    KeyCode::Esc => {
+                    KeyCode::Esc | KeyCode::Enter => {
                         input_mode = InputMode::Normal
                     }
                     _ => {}
