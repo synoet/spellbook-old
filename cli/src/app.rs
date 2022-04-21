@@ -7,12 +7,19 @@ use crate::{
     DB_PATH,
 };
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Tab {
     Local,
     Remote,
-    Recipes,
-    Settings,
+}
+
+impl From<Tab> for usize {
+    fn from(item: Tab) -> usize {
+        match item {
+            Tab::Local => 0,
+            Tab::Remote => 1,
+        }
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -62,7 +69,7 @@ pub struct App {
 
 impl App {
 
-    pub fn new(self, config : Config) -> Self {
+    pub fn new(config : Config) -> Self {
         App {
             config,
             input_mode: InputMode::Normal,
@@ -74,6 +81,10 @@ impl App {
             rc_search_query: String::new(),
             commands: vec![],
         }
+    }
+
+    pub fn active_tab_index(&mut self) -> usize {
+        self.active_tab.into()
     }
 
     pub fn set_active_tab(&mut self, tab: Tab) {
@@ -103,6 +114,23 @@ impl App {
         match self.input_mode {
             InputMode::Normal => self.input_mode = InputMode::Insert,
             _ => {}
+        }
+    }
+
+    pub fn on_esc(&mut self) {
+        match self.input_mode {
+            InputMode::Insert => self.input_mode = InputMode::Normal,
+            _ => {}
+        }
+    }
+
+    pub fn on_enter(&mut self) {
+        match self.input_mode {
+            InputMode::Insert => self.input_mode = InputMode::Normal,
+            InputMode::Normal => {
+                // TODO -- implement command copying
+                unimplemented!()
+            }
         }
     }
 
@@ -149,6 +177,7 @@ impl App {
         let db_content = fs::read_to_string(DB_PATH)?;
         let parsed: Vec<LocalCommand> = serde_json::from_str(&db_content)?;
         self.commands = parsed;
+        self.lc_state.select(Some(0));
 
         Ok(())
     }

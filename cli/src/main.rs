@@ -49,32 +49,8 @@ enum Event<I> {
     Tick,
 }
 
-#[derive(Copy, Clone, Debug)]
-enum MenuItem {
-    LocalCommands,
-}
-
-#[derive(Copy, Clone, Debug)]
-enum Popup {
-    AddCommand,
-    None,
-}
-
-#[derive(Copy, Clone, Debug)]
-enum InputMode {
-    Normal,
-    Insert
-}
-
-impl From<MenuItem> for usize {
-    fn from(item: MenuItem) -> usize {
-        match item {
-            MenuItem::LocalCommands => 0,
-        }
-    }
-}
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+
     enable_raw_mode().expect("can run in raw mode");
     let (tx, rx) = mpsc::channel();
     let tick_rate = Duration::from_millis(250);
@@ -102,14 +78,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
+
+
+    let mut app = app::App::new(app::Config::default());
+    app.read_local_commands().expect("Read Local Commands");
     
     let menu_titles = vec!["Local Commands", "Installer", "Help"];
-    let mut active_menu_item = MenuItem::LocalCommands;
-    let mut search_query = String::new();
-    let mut input_mode =  InputMode::Normal;
-    let mut active_popup = Popup::None;
-    let mut command_state = ListState::default();
-    command_state.select(Some(0));
 
     loop {
         terminal.draw(|rect| {
@@ -144,7 +118,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .collect();
 
             let tabs = Tabs::new(menu)
-                .select(active_menu_item.into())
+                .select(app.active_tab.into())
                 .block(Block::default().title("Menu").borders(Borders::ALL))
                 .style(Style::default().fg(Color::White))
                 .highlight_style(Style::default().fg(Color::Yellow))
@@ -152,10 +126,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             rect.render_widget(tabs, chunks[0]);
 
-            let search = Paragraph::new(search_query.as_ref())
-                .style(match input_mode {
-                    InputMode::Normal => Style::default(),
-                    InputMode::Insert => Style::default().fg(Color::Yellow),
+            let search = Paragraph::new(app.lc_search_query.as_ref())
+                .style(match app.input_mode {
+                    app::InputMode::Normal => Style::default(),
+                    app::InputMode::Insert => Style::default().fg(Color::Yellow),
                 })
                 .block(Block::default().borders(Borders::ALL).title("Search"));
 
@@ -168,137 +142,67 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .style(Style::default().fg(Color::White))
                 );
 
-            match active_menu_item {
-                MenuItem::LocalCommands => {
+            match app.active_tab {
+                app::Tab::Local => {
                     let commands_chunks = Layout::default()
                         .direction(Direction::Horizontal)
                         .constraints(
                             [Constraint::Percentage(40), Constraint::Percentage(60)].as_ref(),
                         )
                         .split(chunks[2]);
-                    let (left, right) = render_commands(&command_state, search_query.as_str());
-                    rect.render_stateful_widget(left, commands_chunks[0], &mut command_state);
+                    let (left, right) = render_commands(&app);
+                    rect.render_stateful_widget(left, commands_chunks[0], &mut app.lc_state);
                     rect.render_widget(right, commands_chunks[1]);
                 }
+                _ => {}
             }
 
-            match input_mode {
-                InputMode::Normal => {}
-                InputMode::Insert => {
+            match app.input_mode {
+                app::InputMode::Normal => {}
+                app::InputMode::Insert => {
                     rect.set_cursor(
-                        chunks[1].x + search_query.width() as u16 + 1,
+                        chunks[1].x + app.lc_search_query.width() as u16 + 1,
                         chunks[1].y + 1,
                     )
 
                 }
             }
             rect.render_widget(search, chunks[1]);
-    Sync,
             rect.render_widget(branding, chunks[3]);
         })?;
 
-
         match rx.recv()? {
-            Event::Input(event) => match input_mode {
-                InputMode::Normal => match event.code {
-                    KeyCode::Char('q') => {
-                        disable_raw_mode()?;
-                        terminal.show_cursor()?;
-                        terminal.clear()?;
-                        break;
-                    }
-                    KeyCode::Char('/') => {
-                        match input_mode {
-                            InputMode::Normal => {
-                                input_mode = InputMode::Insert;
-                            }
-                            InputMode::Insert => {
-                                input_mode = InputMode::Normal;
-                            }
-                        }
-                    }
-                    KeyCode::Down => {
-                        if let Some(selected) = command_state.selected() {
-                            let amount_commands = read_db().expect("can fetch command list").len();
-                            if selected >= amount_commands - 1 {
-                                command_state.select(Some(0));
-                            } else {
-                                command_state.select(Some(selected + 1));
-                            }
-                        }
-                    }
-                    KeyCode::Up => {
-                        if let Some(selected) = command_state.selected() {
-                            let amount_commands = read_db().expect("can fetch command list").len();
-                            if selected > 0 {
-                                command_state.select(Some(selected - 1));
-                            } else {
-                                command_state.select(Some(amount_commands - 1));
-                            }
-                        }
-                    }
-                    _ => {}
+            Event::Input(event) => match (app.input_mode, event.code) {
+                (_, KeyCode::Char('q')) => {
+                    disable_raw_mode()?;
+                    terminal.show_cursor()?;
+                    terminal.clear()?;
+                    break;
                 }
-                InputMode::Insert => match event.code {
-                    KeyCode::Char(c) => {
-                        search_query.push(c);
-                    }
-                    KeyCode::Backspace => {
-                        search_query.pop();
-                    }
-                    KeyCode::Esc | KeyCode::Enter => {
-                        input_mode = InputMode::Normal
-                    }
-                    _ => {}
-                }
-            }
+                (app::InputMode::Insert, KeyCode::Char(c)) => app.on_insert(c),
+                (_, KeyCode::Esc) => app.on_esc(),
+                (_, KeyCode::Enter) => app.on_enter(),
+                (_, KeyCode::Backspace) => app.on_backspace(),
+                (_, KeyCode::Char('/')) => app.on_slash(),
+                (_, KeyCode::Down) => app.on_down(),
+                (_, KeyCode::Up) => app.on_up(),
+                _ => {},
+            },
             _ => {}
         }
-
     }
 
     Ok(())
 }
 
-fn command_rank_sort(commands: Vec<LocalCommand>, query: &str) -> Vec<LocalCommand> {
-    struct RankedCommand {
-        command: LocalCommand,
-        rank: usize
-    }
-
-    let lower_query = query.to_lowercase();
-
-    let query_tags: Vec<&str> = lower_query.split(" ").collect();
-
-    let mut ranked_commands: Vec<RankedCommand> = commands.iter().map(|c| {
-        let description_words: Vec<String> = c.description.split(" ").map(|s| String::from(s)).collect();
-        let content_words: Vec<String> = c.content.split(" ").map(|s| String::from(s)).collect();
-
-        let label_rank = c.labels.iter().filter(|l| query_tags.contains(&l.as_str())).count();
-        let description_rank = description_words.iter().filter(|d| query_tags.contains(&d.as_str())).count();
-        let content_rank = content_words.iter().filter(|c| query_tags.contains(&c.as_str())).count();
-
-        RankedCommand {
-            command: c.to_owned(),
-            rank: label_rank + description_rank + content_rank, 
-        }
-    }).collect::<Vec<RankedCommand>>();
-
-    ranked_commands.sort_by(|a, b| b.rank.cmp(&a.rank));
-
-    ranked_commands.iter().map(|rc| rc.command.to_owned()).collect()
-}
-
-fn render_commands<'a>(command_state: &ListState,  query: &str) -> (List<'a>, Table<'a>) {
+fn render_commands<'a>(app: &app::App) -> (List<'a>, Table<'a>) {
     let commands = Block::default()
         .borders(Borders::ALL)
         .style(Style::default().fg(Color::White))
         .title("Local Commands")
         .border_type(BorderType::Plain);
 
-    let command_list_raw = read_db().expect("can fetch command list");
-
-    let command_list = command_rank_sort(command_list_raw, query);
+    let command_list = app.commands.clone();
 
     let items: Vec<_> = command_list
         .iter()
@@ -312,7 +216,7 @@ fn render_commands<'a>(command_state: &ListState,  query: &str) -> (List<'a>, Ta
 
     let selected_command = command_list
         .get(
-            command_state
+            app.lc_state
                 .selected()
                 .expect(""),
         )
@@ -358,10 +262,4 @@ fn render_commands<'a>(command_state: &ListState,  query: &str) -> (List<'a>, Ta
     ]);
 
     (list, command_details)
-}
-
-fn read_db() -> Result<Vec<LocalCommand>, Error> {
-    let db_content = fs::read_to_string(DB_PATH)?;
-    let parsed: Vec<LocalCommand> = serde_json::from_str(&db_content)?;
-    Ok(parsed)
 }
