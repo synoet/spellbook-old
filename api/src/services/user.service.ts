@@ -16,7 +16,7 @@ export class UserService {
         });
     }
 
-    async create(user: Partial<User>): Promise<User> {
+    async create(user: User): Promise<User> {
         return await this.prisma.user.create({
           data: {
             id: cuid(),
