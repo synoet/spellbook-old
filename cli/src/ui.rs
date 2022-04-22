@@ -8,12 +8,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 use tui::{
     backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Direction, Layout },
-    style::{Color, Modifier, Style},
-    text::{Span, Spans},
-    widgets::{
-        Block, Borders, Paragraph, Tabs,
-    },
+    layout::{Constraint, Direction, Layout },
     Terminal,
 };
 use crate::app;
@@ -59,14 +54,14 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
     loop {
         terminal.draw(|mut rect| {
             let size = rect.size();
+
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .margin(2)
                 .constraints([
                     Constraint::Length(3),
                     Constraint::Length(3),
-                    Constraint::Min(2),
-                    Constraint::Length(3),
+                    Constraint::Min(3),
                 ]
                 .as_ref(),
             )
@@ -78,15 +73,6 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 chunks[0],
                 &mut rect,
             );
-
-            let branding = Paragraph::new("  spellbook v0.1.0")
-                .style(Style::default().fg(Color::Yellow))
-                .alignment(Alignment::Center)
-                .block(
-                    Block::default()
-                        .borders(Borders::NONE)
-                        .style(Style::default().fg(Color::White))
-                );
 
             match app.active_tab {
                 app::Tab::Local => {
@@ -124,7 +110,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 chunks[1],
                 &mut rect,
             );
-            rect.render_widget(branding, chunks[3]);
+
         })?;
 
         match rx.recv()? {
