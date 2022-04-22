@@ -3,7 +3,6 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
 };
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::io;
 use std::sync::mpsc;
 use std::thread;
@@ -11,18 +10,24 @@ use std::time::{Duration, Instant};
 use thiserror::Error;
 use tui::{
     backend::CrosstermBackend,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout },
     style::{Color, Modifier, Style},
     text::{Span, Spans},
     widgets::{
-        Block, BorderType, Borders, Cell, List, ListItem, ListState, Paragraph, Row, Table, Tabs, Clear,
+        Block, Borders, Paragraph, Tabs,
     },
     Terminal,
 };
 
 use unicode_width::UnicodeWidthStr;
 
+mod widgets;
 mod app;
+
+use crate::widgets::{
+    CommandWidget,
+    SearchBarWidget,
+};
 
 const DB_PATH: &str = "./data/db.json";
 
@@ -37,7 +42,7 @@ pub struct LocalCommand {
 }
 
 #[derive(Error, Debug)]
-enum Error {
+pub enum Error {
     #[error("error reading from DB file")]
     ReadDbError(#[from] io::Error),
     #[error("error parsing from DB file")]
@@ -86,7 +91,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let menu_titles = vec!["Local Commands", "Installer", "Help"];
 
     loop {
-        terminal.draw(|rect| {
+        terminal.draw(|mut rect| {
             let size = rect.size();
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
@@ -126,13 +131,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             rect.render_widget(tabs, chunks[0]);
 
-            let search = Paragraph::new(app.lc_search_query.as_ref())
-                .style(match app.input_mode {
-                    app::InputMode::Normal => Style::default(),
-                    app::InputMode::Insert => Style::default().fg(Color::Yellow),
-                })
-                .block(Block::default().borders(Borders::ALL).title("Search"));
-
             let branding = Paragraph::new("  spellbook v0.1.0")
                 .style(Style::default().fg(Color::Yellow))
                 .alignment(Alignment::Center)
@@ -150,9 +148,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             [Constraint::Percentage(40), Constraint::Percentage(60)].as_ref(),
                         )
                         .split(chunks[2]);
-                    let (left, right) = render_commands(&app);
-                    rect.render_stateful_widget(left, commands_chunks[0], &mut app.lc_state);
-                    rect.render_widget(right, commands_chunks[1]);
+
+                    CommandWidget::draw(
+                        &app.commands,
+                        &mut app.lc_state,
+                        vec![commands_chunks[0], commands_chunks[1]],
+                        &mut rect,
+                    );
                 }
                 _ => {}
             }
@@ -167,7 +169,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 }
             }
-            rect.render_widget(search, chunks[1]);
+
+            SearchBarWidget::draw(
+                &app.input_mode,
+                &app.lc_search_query,
+                chunks[1],
+                &mut rect,
+            );
             rect.render_widget(branding, chunks[3]);
         })?;
 
@@ -193,73 +201,4 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
-}
-
-fn render_commands<'a>(app: &app::App) -> (List<'a>, Table<'a>) {
-    let commands = Block::default()
-        .borders(Borders::ALL)
-        .style(Style::default().fg(Color::White))
-        .title("Local Commands")
-        .border_type(BorderType::Plain);
-
-    let command_list = app.commands.clone();
-
-    let items: Vec<_> = command_list
-        .iter()
-        .map(|command| {
-            ListItem::new(Spans::from(vec![Span::styled(
-                command.content.clone(),
-                Style::default(),
-            )]))
-        })
-        .collect();
-
-    let selected_command = command_list
-        .get(
-            app.lc_state
-                .selected()
-                .expect(""),
-        )
-        .expect("exists")
-        .clone();
-
-    let list = List::new(items).block(commands).highlight_style(
-        Style::default()
-            .bg(Color::Yellow)
-            .fg(Color::Black)
-            .add_modifier(Modifier::BOLD),
-    );
-
-    let command_details = Table::new(vec![
-        Row::new(vec![
-            Span::styled("Id:", Style::default().add_modifier(Modifier::BOLD)),
-            Span::styled(selected_command.id.to_string(), Style::default())
-        ]).height(2),
-        Row::new(vec![
-            Span::styled("Command:", Style::default().add_modifier(Modifier::BOLD)),
-            Span::styled(format!("  {}  ", selected_command.content.to_string()),
-                Style::default().bg(Color::Yellow).fg(Color::Black).add_modifier(Modifier::BOLD)),
-        ]).height(2),
-        Row::new(vec![
-            Span::styled("Description:", Style::default().add_modifier(Modifier::BOLD)),
-            Span::styled(selected_command.description.to_string(), Style::default())
-        ]).height(2),
-        Row::new(vec![
-            Span::styled("Labels:", Style::default().add_modifier(Modifier::BOLD)),
-            Span::styled(format!("{:?}", selected_command.labels), Style::default())
-        ]).height(2)
-    ])
-    .block(
-        Block::default()
-            .borders(Borders::ALL)
-            .style(Style::default().fg(Color::White))
-            .title("Detail")
-            .border_type(BorderType::Plain),
-    )
-    .widths(&[
-        Constraint::Percentage(10),
-        Constraint::Percentage(90),
-    ]);
-
-    (list, command_details)
 }
