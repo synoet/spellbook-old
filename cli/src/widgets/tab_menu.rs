@@ -16,7 +16,7 @@ impl TabMenuWidget {
         let menu = tabs
             .iter()
             .map(|t| {
-                let (first, rest) = t.split_at(1);
+                let (first, rest) = t.split_at(3);
                 Spans::from(vec![
                     Span::styled(
                         first,

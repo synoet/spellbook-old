@@ -68,7 +68,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 .split(size);
 
             TabMenuWidget::draw(
-                vec!["Local Commands", "Installer", "Help"],
+                vec!["[1]Local", "[2]Remote", "[3]Help"],
                 app.active_tab,
                 chunks[0],
                 &mut rect,
@@ -111,7 +111,9 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                     terminal.show_cursor()?;
                     terminal.clear()?;
                     break;
-                }
+                },
+                (app::InputMode::Normal, KeyCode::Char('1')) => app.set_active_tab(app::Tab::Local),
+                (app::InputMode::Normal, KeyCode::Char('2')) => app.set_active_tab(app::Tab::Remote),
                 (app::InputMode::Insert, KeyCode::Char(c)) => app.on_insert(c),
                 (_, KeyCode::Esc) => app.on_esc(),
                 (_, KeyCode::Enter) => app.on_enter(),

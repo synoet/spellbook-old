@@ -5,6 +5,7 @@ use thiserror::Error;
 mod app;
 mod ui;
 mod widgets;
+mod utils;
 
 const DB_PATH: &str = "./data/db.json";
 

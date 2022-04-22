@@ -2,6 +2,7 @@ use std::fs;
 use tui::widgets::ListState;
 
 use crate::{Error, LocalCommand, DB_PATH};
+use crate::utils::rank_sort;
 
 #[derive(Copy, Clone, Debug)]
 pub enum Tab {
@@ -78,11 +79,15 @@ impl App {
         }
     }
 
+    pub fn set_active_tab(&mut self, tab: Tab) {
+        self.active_tab = tab;
+    }
+
     pub fn on_insert(&mut self, c: char) {
         match self.active_tab {
             Tab::Local => {
                 self.lc_search_query.push(c);
-                self.sort();
+                rank_sort(&mut self.commands, &self.lc_search_query);
             }
             Tab::Remote => self.rc_search_query.push(c),
         }
@@ -116,7 +121,7 @@ impl App {
         match (self.active_tab, self.input_mode) {
             (Tab::Local, InputMode::Insert) => {
                 self.lc_search_query.pop();
-                self.sort();
+                rank_sort(&mut self.commands, &self.lc_search_query);
             }
             (Tab::Remote, InputMode::Insert) => {
                 self.rc_search_query.pop();
@@ -158,48 +163,5 @@ impl App {
         self.lc_state.select(Some(0));
 
         Ok(())
-    }
-
-    fn sort(&mut self) {
-        let lower_query = self.lc_search_query.to_lowercase();
-
-        let query_tags: Vec<&str> = lower_query.split(" ").collect();
-
-        let mut ranked_commands: Vec<RankedCommand> = self
-            .commands
-            .iter()
-            .map(|c| {
-                let description_words: Vec<String> =
-                    c.description.split(" ").map(|s| String::from(s)).collect();
-                let content_words: Vec<String> =
-                    c.content.split(" ").map(|s| String::from(s)).collect();
-
-                let label_rank = c
-                    .labels
-                    .iter()
-                    .filter(|l| query_tags.contains(&l.as_str()))
-                    .count();
-                let description_rank = description_words
-                    .iter()
-                    .filter(|d| query_tags.contains(&d.as_str()))
-                    .count();
-                let content_rank = content_words
-                    .iter()
-                    .filter(|c| query_tags.contains(&c.as_str()))
-                    .count();
-
-                RankedCommand {
-                    command: c.to_owned(),
-                    rank: label_rank + description_rank + content_rank,
-                }
-            })
-            .collect::<Vec<RankedCommand>>();
-
-        ranked_commands.sort_by(|a, b| b.rank.cmp(&a.rank));
-
-        self.commands = ranked_commands
-            .iter()
-            .map(|rc| rc.command.to_owned())
-            .collect();
     }
 }
