@@ -83,14 +83,6 @@ impl App {
         }
     }
 
-    pub fn active_tab_index(&mut self) -> usize {
-        self.active_tab.into()
-    }
-
-    pub fn set_active_tab(&mut self, tab: Tab) {
-        self.active_tab = tab;
-    }
-
     pub fn on_insert(&mut self, c: char) {
         match self.active_tab {
             Tab::Local => {
@@ -98,15 +90,6 @@ impl App {
                 self.sort();
             },
             Tab::Remote => self.rc_search_query.push(c),
-            _ => {}
-        }
-    }
-
-    pub fn clear_search_query(&mut self) {
-        match self.active_tab {
-            Tab::Local => self.lc_search_query = String::new(),
-            Tab::Remote => self.rc_search_query = String::new(),
-            _ => {},
         }
     }
 

@@ -1,17 +1,11 @@
 use tui::{
-    layout::{
-        Constraint,
-        Rect
-    },
+    layout::{Constraint,Rect},
     style::{
         Color,
         Modifier,
         Style
     },
-    text::{
-        Span,
-        Spans
-    },
+    text::{Span,Spans},
     widgets::{
         Block,
         BorderType,
