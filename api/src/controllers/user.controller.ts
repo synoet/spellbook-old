@@ -10,8 +10,8 @@ import {UserService} from '../services/user.service';
 export default async (app: FastifyInstance,  service: UserService) => {
 
     // create user
-    app.post<{ Body: Partial<User> }>("/users/create", async (request: FastifyRequest, reply: FastifyReply) => {
-        const user  = request.body as Partial<User>;
+    app.post<{ Body: User }>("/users/create", async (request: FastifyRequest, reply: FastifyReply) => {
+        const user  = request.body as User;
 
         const newUser = await service.create(user).catch((err: any) => {
             reply.status(500).send({
