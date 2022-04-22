@@ -1,10 +1,10 @@
 use tui::{
-    layout::Rect,
     backend::Backend,
-    widgets::{Block, Borders, Tabs},
-    style::{Color, Style, Modifier},
-    text::{Span, Spans},
+    layout::Rect,
+    style::{Color, Modifier, Style},
     terminal::Frame,
+    text::{Span, Spans},
+    widgets::{Block, Borders, Tabs},
 };
 
 pub struct TabMenuWidget;
@@ -12,9 +12,7 @@ pub struct TabMenuWidget;
 use crate::app::Tab;
 
 impl TabMenuWidget {
-    pub fn draw<B: Backend>(
-        tabs: Vec<&str>, active_tab: Tab, loc: Rect, f: &mut Frame<B>,
-    ) {
+    pub fn draw<B: Backend>(tabs: Vec<&str>, active_tab: Tab, loc: Rect, f: &mut Frame<B>) {
         let menu = tabs
             .iter()
             .map(|t| {

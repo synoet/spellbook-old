@@ -2,10 +2,9 @@ use serde::{Deserialize, Serialize};
 use std::io;
 use thiserror::Error;
 
-
-mod widgets;
 mod app;
 mod ui;
+mod widgets;
 
 const DB_PATH: &str = "./data/db.json";
 
@@ -35,7 +34,6 @@ pub enum Event<I> {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut app = app::App::new(app::Config::default());
     ui::draw_tui(&mut app).expect("Failed to draw TUI");
-
 
     Ok(())
 }

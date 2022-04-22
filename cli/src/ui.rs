@@ -1,3 +1,8 @@
+use crate::app;
+use crate::widgets::CommandWidget;
+use crate::widgets::SearchBarWidget;
+use crate::widgets::TabMenuWidget;
+use crate::Event;
 use crossterm::{
     event::{self, Event as CEvent, KeyCode},
     terminal::{disable_raw_mode, enable_raw_mode},
@@ -8,14 +13,9 @@ use std::thread;
 use std::time::{Duration, Instant};
 use tui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout },
+    layout::{Constraint, Direction, Layout},
     Terminal,
 };
-use crate::app;
-use crate::Event;
-use crate::widgets::CommandWidget;
-use crate::widgets::SearchBarWidget;
-use crate::widgets::TabMenuWidget;
 
 use unicode_width::UnicodeWidthStr;
 
@@ -28,10 +28,10 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
         loop {
             let timeout = tick_rate
                 .checked_sub(last_tick.elapsed())
-                .unwrap_or_else( || Duration::from_millis(0));
+                .unwrap_or_else(|| Duration::from_millis(0));
 
             if event::poll(timeout).expect("poll works") {
-                if let CEvent::Key(key) = event::read().expect("can read event") { 
+                if let CEvent::Key(key) = event::read().expect("can read event") {
                     tx.send(Event::Input(key)).expect("can send event");
                 }
             }
@@ -48,7 +48,6 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-
     app.read_local_commands().expect("Read Local Commands");
 
     loop {
@@ -58,14 +57,15 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .margin(2)
-                .constraints([
-                    Constraint::Length(3),
-                    Constraint::Length(3),
-                    Constraint::Min(3),
-                ]
-                .as_ref(),
-            )
-            .split(size);
+                .constraints(
+                    [
+                        Constraint::Length(3),
+                        Constraint::Length(3),
+                        Constraint::Min(3),
+                    ]
+                    .as_ref(),
+                )
+                .split(size);
 
             TabMenuWidget::draw(
                 vec!["Local Commands", "Installer", "Help"],
@@ -95,22 +95,13 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
 
             match app.input_mode {
                 app::InputMode::Normal => {}
-                app::InputMode::Insert => {
-                    rect.set_cursor(
-                        chunks[1].x + app.lc_search_query.width() as u16 + 1,
-                        chunks[1].y + 1,
-                    )
-
-                }
+                app::InputMode::Insert => rect.set_cursor(
+                    chunks[1].x + app.lc_search_query.width() as u16 + 1,
+                    chunks[1].y + 1,
+                ),
             }
 
-            SearchBarWidget::draw(
-                &app.input_mode,
-                &app.lc_search_query,
-                chunks[1],
-                &mut rect,
-            );
-
+            SearchBarWidget::draw(&app.input_mode, &app.lc_search_query, chunks[1], &mut rect);
         })?;
 
         match rx.recv()? {
@@ -128,7 +119,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 (_, KeyCode::Char('/')) => app.on_slash(),
                 (_, KeyCode::Down) => app.on_down(),
                 (_, KeyCode::Up) => app.on_up(),
-                _ => {},
+                _ => {}
             },
             _ => {}
         }
