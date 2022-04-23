@@ -30,6 +30,14 @@ export default async (app: FastifyInstance) => {
                 id: { type: 'string', format: 'uuid' },
                 email: {type: 'string', format: 'email' }
               }
+            },
+            // TODO: finish this type definition
+            Command: {
+                type: 'object',
+                required: [],
+                properties: {
+
+                }
             }
           },
           securityDefinitions: {
@@ -39,6 +47,7 @@ export default async (app: FastifyInstance) => {
           docExpansion: 'full',
           deepLinking: false
         },
-        exposeRoute: false
-      })
+        exposeRoute: true
+    });
+
 }

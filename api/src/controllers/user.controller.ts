@@ -10,7 +10,16 @@ import {UserService} from '../services/user.service';
 export default async (app: FastifyInstance,  service: UserService) => {
 
     // create user
-    app.post<{ Body: User }>("/users/create", async (request: FastifyRequest, reply: FastifyReply) => {
+    app.post<{ Body: User }>("/users/create", {
+        schema: {
+            response: {
+                201: {
+                  description: 'Create a user with given email',
+                  type: 'object'
+                }
+              }
+        }
+    }, async (request: FastifyRequest, reply: FastifyReply) => {
         const user  = request.body as User;
 
         const newUser = await service.create(user).catch((err: any) => {
