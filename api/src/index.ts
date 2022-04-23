@@ -2,7 +2,7 @@ import Fastify, { FastifyInstance } from 'fastify';
 
 import CommandController from './controllers/command.controller';
 import UserController from './controllers/user.controller';
-import Swagger from './swagger';
+import Swagger from './utils/swagger';
 import { CommandService } from './services/command.service';
 import { UserService } from './services/user.service';
 import DbClient from './db';
