@@ -143,14 +143,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                     app.set_active_tab(app::Tab::Remote)
                 }
                 (app::InputMode::Insert, KeyCode::Char(c)) => app.on_insert(c),
-                (app::InputMode::Normal, KeyCode::Char('i')) => {
-                    match app.active_tab {
-                        app::Tab::Local => {}
-                        app::Tab::Remote => {
-                            //TODO -- install command
-                        }
-                    }
-                }
+                (app::InputMode::Normal, KeyCode::Char('i')) => app.on_i(),
                 (_, KeyCode::Esc) => app.on_esc(),
                 (_, KeyCode::Enter) => app.on_enter(),
                 (_, KeyCode::Backspace) => app.on_backspace(),
