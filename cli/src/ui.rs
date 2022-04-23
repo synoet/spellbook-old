@@ -74,34 +74,60 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 &mut rect,
             );
 
+            let commands_chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Percentage(40), Constraint::Percentage(60)].as_ref())
+                .split(chunks[2]);
+
             match app.active_tab {
                 app::Tab::Local => {
-                    let commands_chunks = Layout::default()
-                        .direction(Direction::Horizontal)
-                        .constraints(
-                            [Constraint::Percentage(40), Constraint::Percentage(60)].as_ref(),
-                        )
-                        .split(chunks[2]);
-
                     CommandWidget::draw(
+                        &app.active_tab,
                         &app.commands,
                         &mut app.lc_state,
                         vec![commands_chunks[0], commands_chunks[1]],
                         &mut rect,
                     );
                 }
-                _ => {}
+                app::Tab::Remote => CommandWidget::draw(
+                    &app.active_tab,
+                    &app.commands,
+                    &mut app.rc_state,
+                    vec![commands_chunks[0], commands_chunks[1]],
+                    &mut rect,
+                ),
             }
 
-            match app.input_mode {
-                app::InputMode::Normal => {}
-                app::InputMode::Insert => rect.set_cursor(
+            match (app.active_tab, app.input_mode) {
+                (_, app::InputMode::Normal) => {}
+                (app::Tab::Local, app::InputMode::Insert) => rect.set_cursor(
                     chunks[1].x + app.lc_search_query.width() as u16 + 1,
+                    chunks[1].y + 1,
+                ),
+                (app::Tab::Remote, app::InputMode::Insert) => rect.set_cursor(
+                    chunks[1].x + app.rc_search_query.width() as u16 + 1,
                     chunks[1].y + 1,
                 ),
             }
 
-            SearchBarWidget::draw(&app.input_mode, &app.lc_search_query, chunks[1], &mut rect);
+            match app.active_tab {
+                app::Tab::Local => {
+                    SearchBarWidget::draw(
+                        &app.input_mode,
+                        &app.lc_search_query,
+                        chunks[1],
+                        &mut rect,
+                    );
+                }
+                app::Tab::Remote => {
+                    SearchBarWidget::draw(
+                        &app.input_mode,
+                        &app.rc_search_query,
+                        chunks[1],
+                        &mut rect,
+                    );
+                }
+            }
         })?;
 
         match rx.recv()? {
@@ -111,10 +137,20 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                     terminal.show_cursor()?;
                     terminal.clear()?;
                     break;
-                },
+                }
                 (app::InputMode::Normal, KeyCode::Char('1')) => app.set_active_tab(app::Tab::Local),
-                (app::InputMode::Normal, KeyCode::Char('2')) => app.set_active_tab(app::Tab::Remote),
+                (app::InputMode::Normal, KeyCode::Char('2')) => {
+                    app.set_active_tab(app::Tab::Remote)
+                }
                 (app::InputMode::Insert, KeyCode::Char(c)) => app.on_insert(c),
+                (app::InputMode::Normal, KeyCode::Char('i')) => {
+                    match app.active_tab {
+                        app::Tab::Local => {}
+                        app::Tab::Remote => {
+                            //TODO -- install command
+                        }
+                    }
+                }
                 (_, KeyCode::Esc) => app.on_esc(),
                 (_, KeyCode::Enter) => app.on_enter(),
                 (_, KeyCode::Backspace) => app.on_backspace(),

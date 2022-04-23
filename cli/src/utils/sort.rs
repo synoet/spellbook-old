@@ -46,4 +46,3 @@ pub fn rank_sort(commands: &mut Vec<LocalCommand>, query: &String) -> Vec<LocalC
         .map(|rc| rc.command.to_owned())
         .collect()
 }
-

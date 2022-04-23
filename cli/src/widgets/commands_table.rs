@@ -4,24 +4,40 @@ use tui::{
     style::{Color, Modifier, Style},
     terminal::Frame,
     text::{Span, Spans},
-    widgets::{Block, BorderType, Borders, List, ListItem, ListState, Row, Table},
+    widgets::{Block, BorderType, Borders, List, ListItem, ListState, Paragraph, Row, Table},
 };
 
-use crate::LocalCommand;
-
 pub struct CommandWidget;
+use crate::app::Tab;
+use crate::Command;
+use crate::LocalCommand;
 
 impl CommandWidget {
     pub fn draw<B: Backend>(
+        tab: &Tab,
+        // TODO -- correct types
         commands: &Vec<LocalCommand>,
         c_state: &mut ListState,
         loc: Vec<Rect>,
         f: &mut Frame<'_, B>,
     ) {
+        if commands.len() == 0 {
+            f.render_widget(
+                Paragraph::new(Spans::from(vec![Span::raw("No commands found")])),
+                loc[0],
+            );
+            return;
+        }
+
+        let title = match tab {
+            Tab::Remote => "Remote Commands",
+            Tab::Local => "Local Commands",
+        };
+
         let command_list = Block::default()
             .borders(Borders::ALL)
             .style(Style::default().fg(Color::White))
-            .title("Local Commands")
+            .title(title)
             .border_type(BorderType::Plain);
 
         let commands: Vec<LocalCommand> = commands.clone();

@@ -4,8 +4,8 @@ use thiserror::Error;
 
 mod app;
 mod ui;
-mod widgets;
 mod utils;
+mod widgets;
 
 const DB_PATH: &str = "./data/db.json";
 
@@ -17,6 +17,24 @@ pub struct LocalCommand {
     labels: Vec<String>,
     created_at: String,
     updated_at: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RemoteCommand {
+    id: String,
+    content: String,
+    description: String,
+    labels: Vec<String>,
+    created_at: String,
+    updated_at: String,
+    author_id: Option<String>,
+    book_id: Option<String>,
+}
+
+pub enum Command {
+    Local(Vec<LocalCommand>),
+    Remote(Vec<RemoteCommand>),
 }
 
 #[derive(Error, Debug)]

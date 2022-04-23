@@ -1,8 +1,9 @@
+use reqwest;
 use std::fs;
 use tui::widgets::ListState;
 
-use crate::{Error, LocalCommand, DB_PATH};
 use crate::utils::rank_sort;
+use crate::{Error, LocalCommand, RemoteCommand, DB_PATH};
 
 #[derive(Copy, Clone, Debug)]
 pub enum Tab {
@@ -36,11 +37,6 @@ pub enum InputMode {
 pub struct Config {
     pub sync: bool,
     pub disable_remote: bool,
-}
-
-struct RankedCommand {
-    command: LocalCommand,
-    rank: usize,
 }
 
 impl Default for Config {
@@ -80,16 +76,33 @@ impl App {
     }
 
     pub fn set_active_tab(&mut self, tab: Tab) {
-        self.active_tab = tab;
+        match (self.active_tab, tab) {
+            (Tab::Local, Tab::Remote) => {
+                self.active_tab = tab;
+                self.commands = vec![];
+                self.rc_state.select(Some(0));
+            }
+            (Tab::Remote, Tab::Local) => {
+                self.read_local_commands()
+                    .expect("Failed to read local commands");
+                self.active_tab = tab;
+                self.lc_state.select(Some(0));
+            }
+            _ => {}
+        }
     }
 
     pub fn on_insert(&mut self, c: char) {
         match self.active_tab {
             Tab::Local => {
                 self.lc_search_query.push(c);
-                rank_sort(&mut self.commands, &self.lc_search_query);
+                self.commands = rank_sort(&mut self.commands, &self.lc_search_query);
             }
-            Tab::Remote => self.rc_search_query.push(c),
+            Tab::Remote => {
+                self.rc_search_query.push(c);
+                self.remote_command_search()
+                    .expect("Read commands from remote");
+            }
         }
     }
 
@@ -121,7 +134,7 @@ impl App {
         match (self.active_tab, self.input_mode) {
             (Tab::Local, InputMode::Insert) => {
                 self.lc_search_query.pop();
-                rank_sort(&mut self.commands, &self.lc_search_query);
+                self.commands = rank_sort(&mut self.commands, &self.lc_search_query);
             }
             (Tab::Remote, InputMode::Insert) => {
                 self.rc_search_query.pop();
@@ -138,7 +151,11 @@ impl App {
                         self.lc_state.select(Some(selected - 1));
                     }
                 }
-                _ => {}
+                Tab::Remote => {
+                    if self.commands.len() > 0 {
+                        self.rc_state.select(Some(selected - 1));
+                    }
+                }
             }
         }
     }
@@ -151,7 +168,11 @@ impl App {
                         self.lc_state.select(Some(selected + 1));
                     }
                 }
-                _ => {}
+                Tab::Remote => {
+                    if selected < self.commands.len() - 1 {
+                        self.rc_state.select(Some(selected + 1));
+                    }
+                }
             }
         }
     }
@@ -162,6 +183,28 @@ impl App {
         self.commands = parsed;
         self.lc_state.select(Some(0));
 
+        Ok(())
+    }
+
+    #[tokio::main]
+    async fn remote_command_search(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let result = reqwest::get(format!(
+            "http://localhost:8000/commands/search?q={}",
+            self.rc_search_query
+        ))
+        .await;
+        let json = result.unwrap().json::<Vec<RemoteCommand>>().await?;
+        self.commands = json
+            .iter()
+            .map(|c| LocalCommand {
+                id: c.id.clone(),
+                description: c.description.clone(),
+                content: c.content.clone(),
+                labels: c.labels.clone(),
+                created_at: c.created_at.clone(),
+                updated_at: c.updated_at.clone(),
+            })
+            .collect();
         Ok(())
     }
 }
