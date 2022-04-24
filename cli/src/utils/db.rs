@@ -13,6 +13,10 @@ pub fn read_local_commands() -> Result<Vec<LocalCommand>, Error> {
 pub fn install_command_locally(command: LocalCommand) -> Result<(), Error> {
     let mut commands = read_local_commands()?;
 
+    let mut command = command.clone();
+
+    command.installed = Some(true);
+
     commands.push(command);
 
     let new_file_name = DB_PATH.clone().replace("db", "db.backup");

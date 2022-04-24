@@ -17,6 +17,7 @@ pub struct LocalCommand {
     labels: Vec<String>,
     created_at: String,
     updated_at: String,
+    installed: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -44,8 +44,21 @@ impl CommandWidget {
         let items: Vec<_> = commands
             .iter()
             .map(|command| {
+                let mut label = "";
+                if let Some(installed) = command.installed {
+                    if installed {
+                        label = "";
+                    } else {
+                        label = " ";
+                    }
+                }
+                match tab {
+                    Tab::Remote => label = "",
+                    _ => {}
+                };
+
                 ListItem::new(Spans::from(vec![Span::styled(
-                    command.content.clone(),
+                    format!("{}   {}", label, command.content.clone()),
                     Style::default(),
                 )]))
             })

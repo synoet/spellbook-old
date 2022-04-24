@@ -15,6 +15,7 @@ pub async fn remote_command_search(
             labels: c.labels.clone(),
             created_at: c.created_at.clone(),
             updated_at: c.updated_at.clone(),
+            installed: None,
         })
         .collect();
     Ok(parsed)
