@@ -21,6 +21,7 @@ impl From<Tab> for usize {
 #[derive(Copy, Clone)]
 pub enum Popup {
     None,
+    Notification,
     Add,
     Edit,
     Delete,
@@ -55,6 +56,7 @@ pub struct App {
     pub rc_state: ListState,
     pub lc_search_query: String,
     pub rc_search_query: String,
+    pub notification_message: String,
     pub commands: Vec<LocalCommand>,
 }
 
@@ -69,6 +71,7 @@ impl App {
             rc_state: ListState::default(),
             lc_search_query: String::new(),
             rc_search_query: String::new(),
+            notification_message: String::new(),
             commands: vec![],
         }
     }
@@ -139,7 +142,9 @@ impl App {
                 Some(idx) => {
                     let command = self.commands[idx].clone();
                     utils::install_command_locally(command.clone()).expect("Write local command");
+                    self.active_popup = Popup::Notification;
                     self.load_local();
+                    self.notification_message = format!("Installed {}", command.content);
                 }
                 None => {}
             },

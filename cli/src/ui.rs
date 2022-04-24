@@ -1,5 +1,6 @@
 use crate::app;
 use crate::widgets::CommandWidget;
+use crate::widgets::NotificationWidget;
 use crate::widgets::SearchBarWidget;
 use crate::widgets::TabMenuWidget;
 use crate::Event;
@@ -13,7 +14,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 use tui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout},
+    layout::{Constraint, Direction, Layout, Rect},
     Terminal,
 };
 
@@ -88,14 +89,43 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                         vec![commands_chunks[0], commands_chunks[1]],
                         &mut rect,
                     );
+
+                    SearchBarWidget::draw(
+                        &app.input_mode,
+                        &app.lc_search_query,
+                        chunks[1],
+                        &mut rect,
+                    );
                 }
-                app::Tab::Remote => CommandWidget::draw(
-                    &app.active_tab,
-                    &app.commands,
-                    &mut app.rc_state,
-                    vec![commands_chunks[0], commands_chunks[1]],
-                    &mut rect,
-                ),
+                app::Tab::Remote => {
+                    CommandWidget::draw(
+                        &app.active_tab,
+                        &app.commands,
+                        &mut app.rc_state,
+                        vec![commands_chunks[0], commands_chunks[1]],
+                        &mut rect,
+                    );
+
+                    SearchBarWidget::draw(
+                        &app.input_mode,
+                        &app.rc_search_query,
+                        chunks[1],
+                        &mut rect,
+                    );
+                }
+            }
+
+            let popup_chunk = popup_area(30, 10, size);
+
+            match app.active_popup {
+                app::Popup::Notification => {
+                    NotificationWidget::draw(
+                        app.notification_message.clone(),
+                        popup_chunk,
+                        &mut rect,
+                    );
+                }
+                _ => {}
             }
 
             match (app.active_tab, app.input_mode) {
@@ -109,47 +139,31 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                     chunks[1].y + 1,
                 ),
             }
-
-            match app.active_tab {
-                app::Tab::Local => {
-                    SearchBarWidget::draw(
-                        &app.input_mode,
-                        &app.lc_search_query,
-                        chunks[1],
-                        &mut rect,
-                    );
-                }
-                app::Tab::Remote => {
-                    SearchBarWidget::draw(
-                        &app.input_mode,
-                        &app.rc_search_query,
-                        chunks[1],
-                        &mut rect,
-                    );
-                }
-            }
         })?;
 
         match rx.recv()? {
-            Event::Input(event) => match (app.input_mode, event.code) {
-                (_, KeyCode::Char('q')) => {
+            Event::Input(event) => match (app.input_mode, app.active_popup, event.code) {
+                (_, app::Popup::None, KeyCode::Char('q')) => {
                     disable_raw_mode()?;
                     terminal.show_cursor()?;
                     terminal.clear()?;
                     break;
                 }
-                (app::InputMode::Normal, KeyCode::Char('1')) => app.set_active_tab(app::Tab::Local),
-                (app::InputMode::Normal, KeyCode::Char('2')) => {
+                (_, _, KeyCode::Char('q')) => app.active_popup = app::Popup::None,
+                (app::InputMode::Normal, _, KeyCode::Char('1')) => {
+                    app.set_active_tab(app::Tab::Local)
+                }
+                (app::InputMode::Normal, _, KeyCode::Char('2')) => {
                     app.set_active_tab(app::Tab::Remote)
                 }
-                (app::InputMode::Insert, KeyCode::Char(c)) => app.on_insert(c),
-                (app::InputMode::Normal, KeyCode::Char('i')) => app.on_i(),
-                (_, KeyCode::Esc) => app.on_esc(),
-                (_, KeyCode::Enter) => app.on_enter(),
-                (_, KeyCode::Backspace) => app.on_backspace(),
-                (_, KeyCode::Char('/')) => app.on_slash(),
-                (_, KeyCode::Down) => app.on_down(),
-                (_, KeyCode::Up) => app.on_up(),
+                (app::InputMode::Insert, _, KeyCode::Char(c)) => app.on_insert(c),
+                (app::InputMode::Normal, _, KeyCode::Char('i')) => app.on_i(),
+                (_, _, KeyCode::Esc) => app.on_esc(),
+                (_, _, KeyCode::Enter) => app.on_enter(),
+                (_, _, KeyCode::Backspace) => app.on_backspace(),
+                (_, _, KeyCode::Char('/')) => app.on_slash(),
+                (_, _, KeyCode::Down) => app.on_down(),
+                (_, _, KeyCode::Up) => app.on_up(),
                 _ => {}
             },
             _ => {}
@@ -157,4 +171,30 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+fn popup_area(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(
+            [
+                Constraint::Percentage((100 - percent_y) / 2),
+                Constraint::Percentage(percent_y),
+                Constraint::Percentage((100 - percent_y) / 2),
+            ]
+            .as_ref(),
+        )
+        .split(r);
+
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(
+            [
+                Constraint::Percentage((100 - percent_x) / 2),
+                Constraint::Percentage(percent_x),
+                Constraint::Percentage((100 - percent_x) / 2),
+            ]
+            .as_ref(),
+        )
+        .split(popup_layout[1])[1]
 }
