@@ -48,7 +48,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
     let mut terminal = Terminal::new(backend)?;
     terminal.clear()?;
 
-    app.read_local_commands().expect("Read Local Commands");
+    app.load_local();
 
     loop {
         terminal.draw(|mut rect| {

@@ -9,7 +9,6 @@ use tui::{
 
 pub struct CommandWidget;
 use crate::app::Tab;
-use crate::Command;
 use crate::LocalCommand;
 
 impl CommandWidget {

@@ -90,6 +90,11 @@ impl App {
         }
     }
 
+    pub fn load_local(&mut self) {
+        self.commands = utils::read_local_commands().expect("Read Local Commands");
+        self.lc_state.select(Some(0));
+    }
+
     pub fn on_insert(&mut self, c: char) {
         match self.active_tab {
             Tab::Local => {
@@ -130,9 +135,14 @@ impl App {
 
     pub fn on_i(&mut self) {
         match self.active_tab {
-            Tab::Remote => {
-                // TODO -- implement installing a command
-            }
+            Tab::Remote => match self.rc_state.selected() {
+                Some(idx) => {
+                    let command = self.commands[idx].clone();
+                    utils::install_command_locally(command.clone()).expect("Write local command");
+                    self.load_local();
+                }
+                None => {}
+            },
             _ => {}
         };
     }

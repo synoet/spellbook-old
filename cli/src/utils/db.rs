@@ -1,4 +1,5 @@
 use std::fs;
+use std::io::prelude::*;
 
 use crate::{Error, LocalCommand, DB_PATH};
 
@@ -9,6 +10,20 @@ pub fn read_local_commands() -> Result<Vec<LocalCommand>, Error> {
     Ok(parsed)
 }
 
-pub fn install_command_locally() -> Result<(), Error> {
-    unimplemented!()
+pub fn install_command_locally(command: LocalCommand) -> Result<(), Error> {
+    let mut commands = read_local_commands()?;
+
+    commands.push(command);
+
+    let new_file_name = DB_PATH.clone().replace("db", "db.backup");
+
+    let mut file = fs::File::create(&new_file_name)?;
+
+    fs::remove_file(DB_PATH)?;
+
+    fs::rename(&new_file_name, DB_PATH)?;
+
+    file.write_all(serde_json::to_string_pretty(&commands)?.as_bytes())?;
+
+    Ok(())
 }

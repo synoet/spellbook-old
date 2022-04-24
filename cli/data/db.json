@@ -64,5 +64,18 @@
     ],
     "created_at": "2020-01-01t00:00:00.000z",
     "updated_at": "2020-01-01t00:00:00.000z"
+  },
+  {
+    "id": "cl2b2np0l0004cccnhjw97kes",
+    "content": "exa --long --header --git",
+    "description": "list all files in the current directory using exa and show git status",
+    "labels": [
+      "exa",
+      "git",
+      "files",
+      "list"
+    ],
+    "created_at": "2022-04-22T23:36:43.365Z",
+    "updated_at": "2022-04-22T23:36:43.365Z"
   }
 ]
