@@ -19,11 +19,11 @@ pub fn install_command_locally(command: LocalCommand) -> Result<(), Error> {
 
     let mut file = fs::File::create(&new_file_name)?;
 
+    file.write_all(serde_json::to_string_pretty(&commands)?.as_bytes())?;
+
     fs::remove_file(DB_PATH)?;
 
     fs::rename(&new_file_name, DB_PATH)?;
-
-    file.write_all(serde_json::to_string_pretty(&commands)?.as_bytes())?;
 
     Ok(())
 }
