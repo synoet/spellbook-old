@@ -28,6 +28,25 @@ pub fn install_command_locally(command: LocalCommand) -> Result<(), Error> {
     Ok(())
 }
 
+pub fn delete_command_locally(id: String) -> Result<(), Error> {
+    let commands = read_local_commands()?;
+
+    let mut new_commands = commands.clone();
+    new_commands.retain(|c| c.id != id);
+
+    let new_file_name = DB_PATH.clone().replace("db", "db.backup");
+
+    let mut file = fs::File::create(&new_file_name)?;
+
+    file.write_all(serde_json::to_string_pretty(&new_commands)?.as_bytes())?;
+
+    fs::remove_file(DB_PATH)?;
+
+    fs::rename(&new_file_name, DB_PATH)?;
+
+    Ok(())
+}
+
 pub fn is_command_installed(id: String) -> Result<bool, Error> {
     let commands = read_local_commands()?;
 

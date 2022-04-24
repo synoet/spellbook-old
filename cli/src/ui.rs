@@ -158,6 +158,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 }
                 (app::InputMode::Insert, _, KeyCode::Char(c)) => app.on_insert(c),
                 (app::InputMode::Normal, _, KeyCode::Char('i')) => app.on_i(),
+                (app::InputMode::Normal, app::Popup::None, KeyCode::Char('d')) => app.on_delete(),
                 (_, _, KeyCode::Esc) => app.on_esc(),
                 (_, _, KeyCode::Enter) => app.on_enter(),
                 (_, _, KeyCode::Backspace) => app.on_backspace(),

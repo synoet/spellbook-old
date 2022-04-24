@@ -112,6 +112,24 @@ impl App {
         }
     }
 
+    pub fn on_delete(&mut self) {
+        match self.active_tab {
+            Tab::Local => {
+                if let Some(idx) = self.lc_state.selected() {
+                    utils::delete_command_locally(self.commands[idx].id.clone())
+                        .expect("delete command locally");
+                    self.notification_message = format!(
+                        "Sucessfully Deleted Command: {}",
+                        self.commands[idx].content.clone()
+                    );
+                    self.load_local();
+                    self.active_popup = Popup::Notification;
+                }
+            }
+            _ => {}
+        }
+    }
+
     pub fn on_slash(&mut self) {
         match self.input_mode {
             InputMode::Normal => self.input_mode = InputMode::Insert,
