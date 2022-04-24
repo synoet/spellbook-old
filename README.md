@@ -13,6 +13,6 @@
 - [ ] authenticate github sso
 - [ ] sync commands with cloud
 - [x] search commands from cloud
-- [ ] download commands from the cloud locally
+- [x] download commands from the cloud locally
 - [ ] authenticate github sso
 - [ ] publish commands to public cloud registry
