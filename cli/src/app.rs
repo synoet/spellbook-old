@@ -174,16 +174,22 @@ impl App {
     }
 
     pub fn on_up(&mut self) {
-        if let Some(selected) = self.lc_state.selected() {
-            match self.active_tab {
-                Tab::Local => {
-                    if self.commands.len() > 0 {
+        match self.active_tab {
+            Tab::Local => {
+                if let Some(selected) = self.lc_state.selected() {
+                    if selected > 0 && selected <= self.commands.len() {
                         self.lc_state.select(Some(selected - 1));
+                    } else {
+                        self.lc_state.select(Some(self.commands.len() - 1));
                     }
                 }
-                Tab::Remote => {
-                    if self.commands.len() > 0 {
+            }
+            Tab::Remote => {
+                if let Some(selected) = self.rc_state.selected() {
+                    if selected > 0 && selected <= self.commands.len() {
                         self.rc_state.select(Some(selected - 1));
+                    } else {
+                        self.rc_state.select(Some(self.commands.len() - 1));
                     }
                 }
             }
@@ -191,16 +197,22 @@ impl App {
     }
 
     pub fn on_down(&mut self) {
-        if let Some(selected) = self.lc_state.selected() {
-            match self.active_tab {
-                Tab::Local => {
+        match self.active_tab {
+            Tab::Local => {
+                if let Some(selected) = self.lc_state.selected() {
                     if selected < self.commands.len() - 1 {
                         self.lc_state.select(Some(selected + 1));
+                    } else {
+                        self.lc_state.select(Some(0));
                     }
                 }
-                Tab::Remote => {
+            }
+            Tab::Remote => {
+                if let Some(selected) = self.rc_state.selected() {
                     if selected < self.commands.len() - 1 {
                         self.rc_state.select(Some(selected + 1));
+                    } else {
+                        self.rc_state.select(Some(0));
                     }
                 }
             }
