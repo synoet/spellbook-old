@@ -3,7 +3,7 @@ use tui::{
     layout::{Alignment, Rect},
     style::{Color, Modifier, Style},
     text::{Span, Spans},
-    widgets::{Block, Borders, Paragraph},
+    widgets::{Block, Borders, Clear, Paragraph},
     Frame,
 };
 pub struct NotificationWidget;
@@ -19,6 +19,9 @@ impl NotificationWidget {
             )),
             Spans::from(Span::raw("q to close notification")),
         ];
+
+        f.render_widget(Clear, loc);
+
         f.render_widget(
             Paragraph::new(content)
                 .block(
@@ -26,9 +29,9 @@ impl NotificationWidget {
                         .title("Notification! ")
                         .borders(Borders::ALL),
                 )
-                .style(Style::default().fg(Color::White).bg(Color::Black))
+                .style(Style::default().fg(Color::White))
                 .alignment(Alignment::Center),
             loc,
-        )
+        );
     }
 }
