@@ -27,3 +27,9 @@ pub fn install_command_locally(command: LocalCommand) -> Result<(), Error> {
 
     Ok(())
 }
+
+pub fn is_command_installed(id: String) -> Result<bool, Error> {
+    let commands = read_local_commands()?;
+
+    Ok(commands.iter().any(|c| c.id == id))
+}

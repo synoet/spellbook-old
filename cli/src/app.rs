@@ -141,10 +141,18 @@ impl App {
             Tab::Remote => match self.rc_state.selected() {
                 Some(idx) => {
                     let command = self.commands[idx].clone();
+                    if utils::is_command_installed(command.id.clone())
+                        .expect("Read Commands Locally")
+                    {
+                        self.notification_message =
+                            format!("Command {}, is already installed locally", command.content);
+                        self.active_popup = Popup::Notification;
+                        return;
+                    }
                     utils::install_command_locally(command.clone()).expect("Write local command");
+                    self.notification_message = format!("Installed {}", command.content);
                     self.active_popup = Popup::Notification;
                     self.load_local();
-                    self.notification_message = format!("Installed {}", command.content);
                 }
                 None => {}
             },
