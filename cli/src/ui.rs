@@ -75,18 +75,13 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 &mut rect,
             );
 
-            let commands_chunks = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([Constraint::Percentage(40), Constraint::Percentage(60)].as_ref())
-                .split(chunks[2]);
-
             match app.active_tab {
                 app::Tab::Local => {
                     CommandWidget::draw(
                         &app.active_tab,
                         &app.commands,
                         &mut app.lc_state,
-                        vec![commands_chunks[0], commands_chunks[1]],
+                        chunks[2],
                         &mut rect,
                     );
 
@@ -102,7 +97,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                         &app.active_tab,
                         &app.commands,
                         &mut app.rc_state,
-                        vec![commands_chunks[0], commands_chunks[1]],
+                        chunks[2],
                         &mut rect,
                     );
 

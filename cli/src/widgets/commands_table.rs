@@ -1,6 +1,6 @@
 use tui::{
     backend::Backend,
-    layout::{Constraint, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     terminal::Frame,
     text::{Span, Spans},
@@ -17,13 +17,21 @@ impl CommandWidget {
         // TODO -- correct types
         commands: &Vec<LocalCommand>,
         c_state: &mut ListState,
-        loc: Vec<Rect>,
+        loc: Rect,
         f: &mut Frame<'_, B>,
     ) {
+        let chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(40), Constraint::Percentage(60)].as_ref())
+            .split(loc);
+
         if commands.len() == 0 {
             f.render_widget(
-                Paragraph::new(Spans::from(vec![Span::raw("No commands found")])),
-                loc[0],
+                Paragraph::new(Spans::from(vec![Span::raw(
+                    "To search remote commands type '/' and then type your search query.",
+                )]))
+                .alignment(Alignment::Center),
+                loc,
             );
             return;
         }
@@ -116,7 +124,7 @@ impl CommandWidget {
         )
         .widths(&[Constraint::Percentage(10), Constraint::Percentage(90)]);
 
-        f.render_stateful_widget(list, loc[0], c_state);
-        f.render_widget(command_details, loc[1]);
+        f.render_stateful_widget(list, chunks[0], c_state);
+        f.render_widget(command_details, chunks[1]);
     }
 }
