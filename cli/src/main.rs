@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::io;
 use thiserror::Error;
+use clap::{Arg, Command};
 
 mod app;
 mod ui;
@@ -33,11 +34,6 @@ pub struct RemoteCommand {
     book_id: Option<String>,
 }
 
-pub enum Command {
-    Local(Vec<LocalCommand>),
-    Remote(Vec<RemoteCommand>),
-}
-
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("error reading from DB file")]
@@ -52,8 +48,43 @@ pub enum Event<I> {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut app = app::App::new(app::Config::default());
-    ui::draw_tui(&mut app).expect("Failed to draw TUI");
+    let matches = Command::new("spellbook")
+        .about("command manager utility")
+        .version("0.1.0")
+        .subcommand_required(false)
+        .arg_required_else_help(false)
+        .author("synoet")
+        .subcommand(
+            Command::new("add")
+                .short_flag('a')
+                .long_flag("add")
+                .about("add a local command")
+                .args(vec![
+                    Arg::new("content")
+                        .short('c')
+                        .long("content")
+                        .help("command content")
+                        .takes_value(true),
+                    Arg::new("description")
+                        .short('d')
+                        .long("description")
+                        .help("command description")
+                        .takes_value(true),
+                    Arg::new("labels")
+                        .short('l')
+                        .long("command labels")
+                        .takes_value(true)
+                        .multiple_values(true)
+                ])
+        ).get_matches();
+
+    match matches.subcommand() {
+        Some(("add", add_matches)) => {},
+        _ => {
+            let mut app = app::App::new(app::Config::default());
+            ui::draw_tui(&mut app).expect("Failed to draw TUI");
+        }
+    };
 
     Ok(())
 }
