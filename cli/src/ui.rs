@@ -136,6 +136,11 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
             }
         })?;
 
+        match app.quit {
+            true => break,
+            false => {}
+        }
+
         match rx.recv()? {
             Event::Input(event) => match (app.input_mode, app.active_popup, event.code) {
                 (_, app::Popup::None, KeyCode::Char('q')) => {

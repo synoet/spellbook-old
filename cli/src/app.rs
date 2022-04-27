@@ -3,6 +3,8 @@ use tui::widgets::ListState;
 use crate::utils;
 use crate::LocalCommand;
 
+use clipboard::{ClipboardProvider, ClipboardContext};
+
 #[derive(Copy, Clone, Debug)]
 pub enum Tab {
     Local,
@@ -58,6 +60,7 @@ pub struct App {
     pub rc_search_query: String,
     pub notification_message: String,
     pub commands: Vec<LocalCommand>,
+    pub quit: bool,
 }
 
 impl App {
@@ -73,6 +76,7 @@ impl App {
             rc_search_query: String::new(),
             notification_message: String::new(),
             commands: vec![],
+            quit: false,
         }
     }
 
@@ -148,8 +152,9 @@ impl App {
         match self.input_mode {
             InputMode::Insert => self.input_mode = InputMode::Normal,
             InputMode::Normal => {
-                // TODO -- implement command copying
-                unimplemented!()
+                let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
+                ctx.set_contents(self.commands[self.lc_state.selected().unwrap()].content.clone())
+                    .expect("set clipboard");
             }
         }
     }
