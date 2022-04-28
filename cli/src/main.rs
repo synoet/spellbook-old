@@ -2,11 +2,13 @@ use serde::{Deserialize, Serialize};
 use std::io;
 use thiserror::Error;
 use clap::{Arg, Command};
+use cuid::cuid;
 
 mod app;
 mod ui;
 mod utils;
 mod widgets;
+
 
 const DB_PATH: &str = "./data/db.json";
 
@@ -79,7 +81,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ).get_matches();
 
     match matches.subcommand() {
-        Some(("add", add_matches)) => {},
+        Some(("add", add_matches)) => {
+            let content = add_matches.value_of("content").unwrap();
+            let description = add_matches.value_of("description").unwrap();
+            let labels: Vec<&str> = add_matches.values_of("labels").unwrap().collect();
+            utils::add_command_locally(
+                LocalCommand {
+                    id: cuid::cuid()?,
+                    content: content.to_string(),
+                    description: description.to_string(),
+                    labels: labels.iter().map(|x| x.to_string()).collect(),
+                    created_at: chrono::Utc::now().to_rfc3339(),
+                    updated_at: chrono::Utc::now().to_rfc3339(),
+                    installed: Some(false),
+                }
+            ).expect("Adding a command locally");
+        },
         _ => {
             let mut app = app::App::new(app::Config::default());
             ui::draw_tui(&mut app).expect("Failed to draw TUI");

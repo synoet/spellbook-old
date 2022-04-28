@@ -32,6 +32,22 @@ pub fn install_command_locally(command: LocalCommand) -> Result<(), Error> {
     Ok(())
 }
 
+pub fn add_command_locally(command: LocalCommand) -> Result<(), Error> {
+    let mut commands = read_local_commands()?;
+
+    let mut command = command.clone();
+
+    command.installed = Some(false);
+
+    commands.push(command);
+
+    let mut file = fs::File::create(DB_PATH)?;
+
+    file.write_all(serde_json::to_string_pretty(&commands)?.as_bytes())?;
+
+    Ok(())
+}
+
 pub fn delete_command_locally(id: String) -> Result<(), Error> {
     let commands = read_local_commands()?;
 
