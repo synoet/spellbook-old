@@ -1,19 +1,11 @@
 import Fastify, { FastifyInstance } from 'fastify';
-
-import CommandController from './controllers/command.controller';
-import UserController from './controllers/user.controller';
-import Swagger from './utils/swagger';
-import { CommandService } from './services/command.service';
-import { UserService } from './services/user.service';
-import DbClient from './db';
+import configureSwagger from './config/swagger';
+import attachCommandRoutes from './modules/command';
 
 const app: FastifyInstance = Fastify({ logger: true });
 
-const prisma = DbClient.instance;
-
-CommandController(app, new CommandService(prisma));
-UserController(app, new UserService(prisma))
-Swagger(app)
+configureSwagger(app);
+attachCommandRoutes(app);
 
 app.listen(8000, (err, address) => {
   if (err) app.log.error(err)

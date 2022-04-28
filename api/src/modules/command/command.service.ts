@@ -1,5 +1,5 @@
 import {Command} from '@prisma/client'
-import {prisma} from '../../db';
+import {prisma} from '../../utils/db';
 import {stringRankSearch} from '../../utils/search';
 import cuid from 'cuid'
 
