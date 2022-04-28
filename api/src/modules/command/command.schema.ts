@@ -52,6 +52,7 @@ const commandsResponseSchema = z.array(commandResponseSchema);
 
 export type CommandsResponseSchema = z.infer<typeof commandsResponseSchema>;
 export type CreateCommandSchema = z.infer<typeof createCommandSchema>;
+export type UpdateCommandSchema = Partial<z.infer<typeof createCommandSchema>>;
 export type CommandResponseSchema = z.infer<typeof commandResponseSchema>;
 export type GetCommandSchema = z.infer<typeof getCommandSchema>;
 export type SearchCommandsSchema = z.infer<typeof searchCommandsSchema>;
