@@ -19,6 +19,8 @@
     "@types/cuid": "^2.0.1",
     "cuid": "^2.1.8",
     "fastify": "^3.28.0",
-    "fastify-swagger": "^5.1.1"
+    "fastify-swagger": "^5.1.1",
+    "fastify-zod": "^1.0.0-rc10",
+    "zod": "^3.14.4"
   }
 }
