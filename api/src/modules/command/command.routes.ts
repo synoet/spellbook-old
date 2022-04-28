@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { $ref } from "./command.schema";
+
 import {
   CommandResponseSchema,
   CommandsResponseSchema,
@@ -7,6 +8,13 @@ import {
   GetCommandSchema,
   SearchCommandsSchema,
 } from "./command.schema";
+
+import {
+  getHandler,
+  getOneHandler,
+  createHandler,
+  searchHandler,
+} from './command.controller';
 
 export default async function(server: FastifyInstance) {
   server.post<{
@@ -22,7 +30,7 @@ export default async function(server: FastifyInstance) {
         }
       }
     },
-    async (request, reply) => {},
+    createHandler,
   )
 
   server.get<{
@@ -38,7 +46,7 @@ export default async function(server: FastifyInstance) {
         },
       }
     },
-    async (request, reply) => {},
+    getOneHandler,
   )
 
   server.get<{
@@ -53,11 +61,11 @@ export default async function(server: FastifyInstance) {
         }
       }
     },
-    async (request, reply) => {},
+    getHandler,
   )
 
   server.get<{
-    Params: SearchCommandsSchema, 
+    Querystring: SearchCommandsSchema, 
     Reply: CommandsResponseSchema,
   }>
   ("/search",
@@ -69,6 +77,6 @@ export default async function(server: FastifyInstance) {
         }
       }
     },
-    async (request, reply) => {},
+    searchHandler,
   )
 }

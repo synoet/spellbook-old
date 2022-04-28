@@ -41,7 +41,7 @@ const getCommandSchema = z.object({
 });
 
 const searchCommandsSchema = z.object({
-  query: z.string().nonempty({
+  q: z.string().nonempty({
     message: "/search does not support empty queries. try GET /commands",
   }).min(1, {
     message: "A search query requires atleast one word",
