@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use std::io;
 use thiserror::Error;
 use clap::{Arg, Command};
-use cuid::cuid;
 
 mod app;
 mod ui;
@@ -78,7 +77,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .takes_value(true)
                         .multiple_values(true)
                 ])
-        ).get_matches();
+        )
+        .subcommand(
+            Command::new("search")
+                .short_flag('s')
+                .long_flag("search")
+                .about("search for a command")
+                .args(vec![
+                    Arg::new("query")
+                        .short('q')
+                        .long("query")
+                        .help("query string")
+                        .takes_value(true)
+                ])
+        )
+        .get_matches();
 
     match matches.subcommand() {
         Some(("add", add_matches)) => {
@@ -96,6 +109,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     installed: Some(false),
                 }
             ).expect("Adding a command locally");
+        },
+        Some(("search", search_matches)) => {
+            let query = search_matches.value_of("query").unwrap();
+            let mut commands = utils::read_local_commands()?;
+            let ranked_commands = utils::rank_sort(&mut commands, &query.to_string());
+            for (i, command) in ranked_commands.iter().enumerate() {
+                println!("    {}. {}",{i + 1}, command.content);
+            }
         },
         _ => {
             let mut app = app::App::new(app::Config::default());
