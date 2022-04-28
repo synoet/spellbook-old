@@ -65,17 +65,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .short('c')
                         .long("content")
                         .help("command content")
-                        .takes_value(true),
+                        .takes_value(true)
+                        .required(true),
                     Arg::new("description")
                         .short('d')
                         .long("description")
                         .help("command description")
-                        .takes_value(true),
+                        .takes_value(true)
+                        .requires(true),
                     Arg::new("labels")
                         .short('l')
                         .long("command labels")
                         .takes_value(true)
                         .multiple_values(true)
+                        .required(true),
                 ])
         )
         .subcommand(
@@ -89,6 +92,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .long("query")
                         .help("query string")
                         .takes_value(true)
+                        .required(true)
                 ])
         )
         .get_matches();
