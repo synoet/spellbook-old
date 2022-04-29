@@ -1,18 +1,10 @@
-## TODO
+<div align="center">
 
-### API
-- [x] CRUD Commands
-- [x] search commands by description and labels
-- [ ] param validation
-- [ ] better logging
+  <img src="logo/spellbooklogo.png" alt="logo" width="300" height="auto" />
+  <h1>spellbook</h1>
+  <p>
+    A Command Management Tool 
+  </p>
+</div>
 
-### CLI / TUI
-- [ ] create a new command (with labels and descriptions)
-- [x] search for commands (by label and descriptions)
-- [x] store commands locally 
-- [ ] authenticate github sso
-- [ ] sync commands with cloud
-- [x] search commands from cloud
-- [x] download commands from the cloud locally
-- [ ] authenticate github sso
-- [ ] publish commands to public cloud registry
+<br />
