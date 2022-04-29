@@ -9,6 +9,13 @@
 
 <br />
 
+<!-- Features -->
+### :dart: Features
+
+- Store and quickly lookup commands locally (cli/tui)
+- Search commands from spellbook registry (cli/tui)
+- Install commands from registry to local store(cli/tui)
+
 <!-- Run Locally -->
 ### :running: Run Locally
 
