@@ -21,6 +21,7 @@ const commandInput = {
 const commandCreated = {
   id: z.string().cuid(),
   createdAt: z.string().nonempty(),
+  updatedAt: z.string().nonempty(),
   content: z.string().nonempty(),
 }
 

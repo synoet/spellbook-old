@@ -10,63 +10,25 @@
       "namespace"
     ],
     "created_at": "2020-01-01T00:00:00.000Z",
-    "updated_at": "2020-01-01T00:00:00.000Z"
+    "updated_at": "2020-01-01T00:00:00.000Z",
+    "installed": null
   },
   {
-    "id": "b",
-    "content": "kubectl get pvc --namespace=<namespace>",
-    "description": "get all pvc for a namespace in kubectl",
-    "labels": [
-      "kubectl",
-      "pvc",
-      "namespace",
-      "volume"
-    ],
-    "created_at": "2020-01-01T00:00:00.000Z",
-    "updated_at": "2020-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "c",
-    "content": "docker build . -t <image_name>:<image_tag>",
-    "description": "docker build an image from a docker file in the current directory with a name and tag",
+    "id": "cl2pc2oab0000cn3aq8dk4dtk",
+    "content": "docker tag <registry>/<image-name>:<image-tag>",
+    "description": "docker a docker image to a registry with a tag",
     "labels": [
       "docker",
-      "image",
       "tag",
-      "build"
-    ],
-    "created_at": "2020-01-01t00:00:00.000z",
-    "updated_at": "2020-01-01t00:00:00.000z"
-  },
-  {
-    "id": "d",
-    "content": "docker run -it -p 8080:8080 <image_name>:<image_tag>",
-    "description": "docker run a container with an image in interactive mode with a name and tag for a certain port map",
-    "labels": [
-      "docker",
       "image",
-      "run",
-      "interactive",
-      "port"
+      "registry"
     ],
-    "created_at": "2020-01-01t00:00:00.000z",
-    "updated_at": "2020-01-01t00:00:00.000z"
+    "created_at": "2022-05-02T23:09:05.267474284+00:00",
+    "updated_at": "2022-05-02T23:09:05.267479724+00:00",
+    "installed": false
   },
   {
-    "id": "e",
-    "content": "doctl registry get",
-    "description": "doctl get your current registry",
-    "labels": [
-      "doctl",
-      "digital ocean",
-      "registry",
-      "get"
-    ],
-    "created_at": "2020-01-01t00:00:00.000z",
-    "updated_at": "2020-01-01t00:00:00.000z"
-  },
-  {
-    "id": "cl2b2np0l0004cccnhjw97kes",
+    "id": "cl2pc3bf20000cn7ooavmz1pt",
     "content": "exa --long --header --git",
     "description": "list all files in the current directory using exa and show git status",
     "labels": [
@@ -75,7 +37,20 @@
       "files",
       "list"
     ],
-    "created_at": "2022-04-22T23:36:43.365Z",
-    "updated_at": "2022-04-22T23:36:43.365Z"
+    "created_at": "2022-05-02T23:09:35.246222922+00:00",
+    "updated_at": "2022-05-02T23:09:35.246228882+00:00",
+    "installed": false
+  },
+  {
+    "id": "cl2pd459z0000cnddl854nrn2",
+    "content": "sudo pacman -S",
+    "description": "install a command with pacman",
+    "labels": [
+      "arch",
+      "linux"
+    ],
+    "created_at": "2022-05-02T23:38:13.559622007+00:00",
+    "updated_at": "2022-05-02T23:38:13.559625927+00:00",
+    "installed": false
   }
 ]

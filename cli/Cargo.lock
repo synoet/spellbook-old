@@ -132,6 +132,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "termion",
  "thiserror",
  "tokio",
  "tui",

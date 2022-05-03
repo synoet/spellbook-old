@@ -1,8 +1,11 @@
-use crate::app;
-use crate::widgets::CommandWidget;
-use crate::widgets::NotificationWidget;
-use crate::widgets::SearchBarWidget;
-use crate::widgets::TabMenuWidget;
+pub mod app;
+
+
+mod widgets;
+use widgets::CommandWidget;
+use widgets::NotificationWidget;
+use widgets::SearchBarWidget;
+use widgets::TabMenuWidget;
 use crate::Event;
 use crossterm::{
     event::{self, Event as CEvent, KeyCode},
@@ -69,7 +72,7 @@ pub fn draw_tui(app: &mut app::App) -> Result<(), Box<dyn std::error::Error>> {
                 .split(size);
 
             TabMenuWidget::draw(
-                vec!["[1]Local", "[2]Remote", "[3]Help"],
+                vec!["[1] Local", "[2] Remote", "[3] Help"],
                 app.active_tab,
                 chunks[0],
                 &mut rect,
