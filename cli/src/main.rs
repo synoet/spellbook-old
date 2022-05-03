@@ -1,15 +1,17 @@
 use serde::{Deserialize, Serialize};
 use std::io;
 use thiserror::Error;
-use clap::{Arg, Command};
+use clap::{arg, Arg, Command};
 
-mod app;
+mod cli;
+mod core;
 mod ui;
 mod utils;
-mod widgets;
+
+use ui::app;
 
 
-const DB_PATH: &str = "./data/db.json";
+const DB_PATH: &str = "/home/synoet/dev/spellbook/cli/data/db.json";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LocalCommand {
@@ -61,67 +63,85 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .long_flag("add")
                 .about("add a local command")
                 .args(vec![
-                    Arg::new("content")
-                        .short('c')
-                        .long("content")
-                        .help("command content")
-                        .takes_value(true)
-                        .required(true),
+                    arg!([COMMAND] "command to add locally"),
                     Arg::new("description")
                         .short('d')
                         .long("description")
                         .help("command description")
-                        .takes_value(true)
-                        .requires(true),
+                        .takes_value(true),
                     Arg::new("labels")
                         .short('l')
                         .long("command labels")
                         .takes_value(true)
                         .multiple_values(true)
-                        .required(true),
                 ])
         )
         .subcommand(
             Command::new("search")
                 .short_flag('s')
                 .long_flag("search")
-                .about("search for a command")
+                .about("search for a command on the remote registry")
                 .args(vec![
-                    Arg::new("query")
-                        .short('q')
-                        .long("query")
-                        .help("query string")
+                    arg!([QUERY] "search query to filter results from registry"),
+                    Arg::new("limit")
+                        .long("limit")
+                        .help("limit the number of results")
                         .takes_value(true)
-                        .required(true)
+                        .required(false),
                 ])
+        )
+        .subcommand(
+            Command::new("list")
+                .short_flag('l')
+                .long_flag("list")
+                .about("list all commands")
+                .args(vec![
+                    arg!([QUERY] "query to sort list by"),
+                    Arg::new("limit")
+                        .long("limit")
+                        .help("limit number of results")
+                        .takes_value(true)
+                        .required(false)
+                ])
+        )
+        .subcommand(
+            Command::new("install")
+                .short_flag('i')
+                .long_flag("install")
+                .about("install a command locally from registry")
+                .args(vec![
+                    Arg::new("limit")
+                        .long("limit")
+                        .help("limit number of results")
+                        .takes_value(true)
+                        .required(false)
+                ])
+        )
+        .subcommand(
+            Command::new("ammend")
+                .short_flag('m')
+                .long_flag("ammend")
+                .about("ammend a command")
+                .arg(arg!([COMMAND])),
+        )
+        .subcommand(
+            Command::new("explain")
+                .short_flag('e')
+                .long_flag("explain")
+                .about("explain a command")
+                .args(vec![
+                    arg!([COMMAND] "command to explain"),
+                ])
+                
         )
         .get_matches();
 
     match matches.subcommand() {
-        Some(("add", add_matches)) => {
-            let content = add_matches.value_of("content").unwrap();
-            let description = add_matches.value_of("description").unwrap();
-            let labels: Vec<&str> = add_matches.values_of("labels").unwrap().collect();
-            utils::add_command_locally(
-                LocalCommand {
-                    id: cuid::cuid()?,
-                    content: content.to_string(),
-                    description: description.to_string(),
-                    labels: labels.iter().map(|x| x.to_string()).collect(),
-                    created_at: chrono::Utc::now().to_rfc3339(),
-                    updated_at: chrono::Utc::now().to_rfc3339(),
-                    installed: Some(false),
-                }
-            ).expect("Adding a command locally");
-        },
-        Some(("search", search_matches)) => {
-            let query = search_matches.value_of("query").unwrap();
-            let mut commands = utils::read_local_commands()?;
-            let ranked_commands = utils::rank_sort(&mut commands, &query.to_string());
-            for (i, command) in ranked_commands.iter().enumerate() {
-                println!("    {}. {}",{i + 1}, command.content);
-            }
-        },
+        Some(("add", add_matches)) => cli::add(add_matches)?,
+        Some(("search", search_matches)) => cli::search(search_matches)?,
+        Some(("install", install_matches)) => cli::install(install_matches)?,
+        Some(("list", list_matches)) => cli::list(list_matches)?,
+        Some(("ammend", ammend_matches)) => cli::ammend(ammend_matches)?,
         _ => {
             let mut app = app::App::new(app::Config::default());
             ui::draw_tui(&mut app).expect("Failed to draw TUI");
