@@ -28,11 +28,13 @@ fn print_commands(commands: &Vec<LocalCommand>, limit: usize) {
 
 fn print_error_message(message: &str) {
     print!("{}{} warning: {}{}", color::Fg(color::Red), style::Bold, style::Reset, message);
-    print!("{} (we reccomend not adding duplicate commands, if this was intended use {}{}--force{}{} flag)", color::Fg(color::White), style::Reset, style::Bold, style::Reset, color::Fg(color::White));
+    print!("{} (we reccomend not adding duplicate commands, if this was intended use {}{}--force{}{} flag)", 
+        color::Fg(color::White), style::Reset, style::Bold, style::Reset, color::Fg(color::White));
     println!("");
 }
 
 fn print_sucess_message(message: &str) {
+    print!("\n");
     print!("{}{} success: {}{}", color::Fg(color::Green), style::Bold, style::Reset, message);
     println!("\n");
 }
@@ -54,22 +56,32 @@ enum ValueType<'a> {
     List(&'a Vec<String>),
 }
 
-fn ammend_take_input(prompt: &str, old_value: ValueType) -> String {
-    println!("=>{}", prompt);
+fn ammend_take_input(prompt: &str,helper: Option<&str>, old_value: ValueType) -> Option<String> {
+    print!("\n");
+    print!("{}{}{}: ",color::Fg(color::Blue), prompt, style::Reset);
+
+    if let Some(h) = helper {
+        print!("{}({}){}\n", color::Fg(color::White), h, style::Reset);
+    }else {
+        print!("\n");
+    }
 
     let old = match old_value {
         ValueType::Single(value) => value.to_string(),
         ValueType::List(list) => format!("{:?}", &list).to_string(),
     };
 
-    print!("{}==> [{old}]{}", color::Fg(color::Green), style::Reset);
+    print!("{}[{old}]{} {}==> {}",color::Fg(color::White), style::Reset, color::Fg(color::Green), style::Reset);
     std::io::stdout().flush().unwrap();
     let mut input = String::new();
     std::io::stdin()
         .read_line(&mut input)
         .expect("failed to read input");
 
-    input
+    match input.trim() {
+        "" => None,
+        _ => Some(input.trim().to_string()),
+    }
 }
 
 pub fn add(matches: &ArgMatches) -> Result<(), Error>{
@@ -79,7 +91,7 @@ pub fn add(matches: &ArgMatches) -> Result<(), Error>{
 
     if local::exists(content.to_string()) {
         print_error_message("Command already exists");
-        return Ok(());
+        return Ok(())
     }
 
     local::add(content.to_string(), description.to_string(), labels)?;
@@ -114,7 +126,6 @@ pub fn install(matches: &ArgMatches) -> Result<(), Error>{
 
     print_commands(&commands, limit);
 
-
     println!("{}{} ==>  {}{}{} ", color::Fg(color::Green), style::Bold, style::Reset, "Commands to install locally (eg: 1 , 1 2 3)",  style::Reset);
     let input = take_input();
 
@@ -146,7 +157,6 @@ pub fn list(matches: &ArgMatches) -> Result<(), Error>{
 }
 
 pub fn ammend(matches: &ArgMatches) -> Result<(), Error>{
-    let command_content = matches.value_of("COMMAND");
     let mut commands = local::read()?;
 
     match matches.value_of("COMMAND") {
@@ -155,35 +165,34 @@ pub fn ammend(matches: &ArgMatches) -> Result<(), Error>{
             let command = commands.iter().next();
             match command {
                 Some(c) => {
-                    let new_content = ammend_take_input("Edit Command", ValueType::Single(&c.content));
-                    let new_description = ammend_take_input("Edit Description", ValueType::Single(&c.description));
-                    let new_labels = ammend_take_input("Edit Labels", ValueType::List(&c.labels));
+                    let new_content = ammend_take_input("Edit Command",None, ValueType::Single(&c.content));
+                    let new_description = ammend_take_input("Edit Description",None, ValueType::Single(&c.description));
+                    let new_labels = ammend_take_input("Edit Labels",Some("ex: 'label1 label2 label3'"), ValueType::List(&c.labels));
 
-                    let mut parsed_new_labels: Vec<&str> =  new_labels.split(" ").collect();
-                    parsed_new_labels = parsed_new_labels.iter().map(|x| x.trim()).collect();
-
-                    println!("{}, {}, {:?}", new_content, new_description, parsed_new_labels);
+                    let labels = match new_labels {
+                        Some(l) => Some(l.split(" ").map(|x| x.to_string()).collect()),
+                        None => None,
+                    };
 
                     local::ammend(c.content.clone(), local::PartialCommand {
                         content: new_content,
                         description: new_description,
-                        labels: parsed_new_labels
+                        labels,
                     })?;
 
+                    print_sucess_message("Command updated");
                 },
                 None => {
                     println!("Command '{}' not found", content);
-                    return Ok(())
+                    return Ok(());
                 }
             }
         },
         None => {
-            // TODO -- implement prittier error message
             println!("You need to supply a command to ammend");
             return Ok(());
         }
     };
-
     
     Ok(())
 }

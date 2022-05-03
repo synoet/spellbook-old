@@ -77,24 +77,36 @@ pub fn delete(id: String) -> Result<(), Error> {
 }
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PartialCommand {
-    content: Option<String>,
-    description: Option<String>,
-    labels: Option<Vec<String>>,
+    pub content: Option<String>,
+    pub description: Option<String>,
+    pub labels: Option<Vec<String>>,
 }
 
 pub fn ammend(content: String, command: PartialCommand) -> Result<(), Error> {
-    let mut commands = read()?;
-    let mut command = command.clone();
+    let commands = read()?;
 
-    commands.retain(|c| c.content != content);
-    commands.push(command);
+    let old_command = commands.iter().find(|c| c.content == content);
+
+    let mut new_commands = commands.clone();
+
+    new_commands.retain(|c| c.content != content);
+
+    new_commands.push(LocalCommand {
+        id: old_command.unwrap().id.clone(),
+        content: command.content.unwrap_or(old_command.unwrap().content.clone()),
+        description: command.description.unwrap_or(old_command.unwrap().description.clone()),
+        labels: command.labels.unwrap_or(old_command.unwrap().labels.clone()),
+        created_at: old_command.unwrap().created_at.clone(),
+        updated_at: chrono::Utc::now().to_rfc3339(),
+        installed: old_command.unwrap().installed.clone(),
+    });
 
     let new_file_name = DB_PATH.clone().replace("db", "db.backup");
     let mut file = fs::File::create(&new_file_name)?;
 
-    file.write_all(serde_json::to_string_pretty(&commands)?.as_bytes())?;
+    file.write_all(serde_json::to_string_pretty(&new_commands)?.as_bytes())?;
     fs::remove_file(DB_PATH)?;
     fs::rename(&new_file_name, DB_PATH)?;
 

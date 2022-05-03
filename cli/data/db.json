@@ -43,14 +43,16 @@
   },
   {
     "id": "cl2pd459z0000cnddl854nrn2",
-    "content": "sudo pacman -S",
-    "description": "install a command with pacman",
+    "content": "sudo pacman -Ss",
+    "description": "search for a package using pacman package manager",
     "labels": [
       "arch",
-      "linux"
+      "linux",
+      "packages",
+      "pacman"
     ],
     "created_at": "2022-05-02T23:38:13.559622007+00:00",
-    "updated_at": "2022-05-02T23:38:13.559625927+00:00",
+    "updated_at": "2022-05-03T12:19:23.340385017+00:00",
     "installed": false
   }
 ]
