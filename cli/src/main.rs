@@ -1,7 +1,7 @@
+use clap::{arg, Arg, Command};
 use serde::{Deserialize, Serialize};
 use std::io;
 use thiserror::Error;
-use clap::{arg, Arg, Command};
 
 mod cli;
 mod core;
@@ -9,7 +9,6 @@ mod ui;
 mod utils;
 
 use ui::app;
-
 
 const DB_PATH: &str = "/home/synoet/dev/spellbook/cli/data/db.json";
 
@@ -73,8 +72,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .short('l')
                         .long("command labels")
                         .takes_value(true)
-                        .multiple_values(true)
-                ])
+                        .multiple_values(true),
+                ]),
         )
         .subcommand(
             Command::new("search")
@@ -88,7 +87,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .help("limit the number of results")
                         .takes_value(true)
                         .required(false),
-                ])
+                ]),
         )
         .subcommand(
             Command::new("list")
@@ -101,21 +100,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .long("limit")
                         .help("limit number of results")
                         .takes_value(true)
-                        .required(false)
-                ])
+                        .required(false),
+                ]),
         )
         .subcommand(
             Command::new("install")
                 .short_flag('i')
                 .long_flag("install")
                 .about("install a command locally from registry")
-                .args(vec![
-                    Arg::new("limit")
-                        .long("limit")
-                        .help("limit number of results")
-                        .takes_value(true)
-                        .required(false)
-                ])
+                .args(vec![Arg::new("limit")
+                    .long("limit")
+                    .help("limit number of results")
+                    .takes_value(true)
+                    .required(false)]),
         )
         .subcommand(
             Command::new("ammend")
@@ -129,10 +126,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .short_flag('e')
                 .long_flag("explain")
                 .about("explain a command")
-                .args(vec![
-                    arg!([COMMAND] "command to explain"),
-                ])
-                
+                .args(vec![arg!([COMMAND] "command to explain")]),
         )
         .get_matches();
 

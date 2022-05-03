@@ -1,10 +1,13 @@
-use crate::{LocalCommand, Error, RemoteCommand};
+use crate::{Error, LocalCommand, RemoteCommand};
 pub struct Remote;
-
 
 #[tokio::main]
 pub async fn search(query: String) -> Result<Vec<LocalCommand>, Box<dyn std::error::Error>> {
-    let result = reqwest::get(format!("http://localhost:8000/api/commands/search?q={}", query)).await;
+    let result = reqwest::get(format!(
+        "http://localhost:8000/api/commands/search?q={}",
+        query
+    ))
+    .await;
     let json = result.unwrap().json::<Vec<RemoteCommand>>().await?;
     let parsed: Vec<LocalCommand> = json
         .iter()

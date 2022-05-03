@@ -1,11 +1,6 @@
 pub mod app;
 
-
 mod widgets;
-use widgets::CommandWidget;
-use widgets::NotificationWidget;
-use widgets::SearchBarWidget;
-use widgets::TabMenuWidget;
 use crate::Event;
 use crossterm::{
     event::{self, Event as CEvent, KeyCode},
@@ -20,6 +15,10 @@ use tui::{
     layout::{Constraint, Direction, Layout, Rect},
     Terminal,
 };
+use widgets::CommandWidget;
+use widgets::NotificationWidget;
+use widgets::SearchBarWidget;
+use widgets::TabMenuWidget;
 
 use unicode_width::UnicodeWidthStr;
 

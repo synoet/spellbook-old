@@ -3,7 +3,7 @@ use tui::widgets::ListState;
 use crate::utils;
 use crate::LocalCommand;
 
-use clipboard::{ClipboardProvider, ClipboardContext};
+use clipboard::{ClipboardContext, ClipboardProvider};
 
 #[derive(Copy, Clone, Debug)]
 pub enum Tab {
@@ -153,8 +153,12 @@ impl App {
             InputMode::Insert => self.input_mode = InputMode::Normal,
             InputMode::Normal => {
                 let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-                ctx.set_contents(self.commands[self.lc_state.selected().unwrap()].content.clone())
-                    .expect("set clipboard");
+                ctx.set_contents(
+                    self.commands[self.lc_state.selected().unwrap()]
+                        .content
+                        .clone(),
+                )
+                .expect("set clipboard");
             }
         }
     }

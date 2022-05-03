@@ -1,19 +1,19 @@
 use crate::{Error, LocalCommand, DB_PATH};
-use std::fs;
-use std::io::prelude::*;
 use chrono;
 use cuid;
+use std::fs;
+use std::io::prelude::*;
 
-pub fn read() -> Result<Vec<LocalCommand>, Error>{
+pub fn read() -> Result<Vec<LocalCommand>, Error> {
     let content = fs::read_to_string(DB_PATH)?;
     let parsed: Vec<LocalCommand> = serde_json::from_str(&content)?;
 
     Ok(parsed)
 }
 
-pub fn exists(content: String) -> bool{
+pub fn exists(content: String) -> bool {
     let commands = read().unwrap();
-    if commands.iter().any(|c| c.content == content){
+    if commands.iter().any(|c| c.content == content) {
         return true;
     }
     false
@@ -76,7 +76,6 @@ pub fn delete(id: String) -> Result<(), Error> {
     Ok(())
 }
 
-
 #[derive(Clone, Debug)]
 pub struct PartialCommand {
     pub content: Option<String>,
@@ -95,9 +94,15 @@ pub fn ammend(content: String, command: PartialCommand) -> Result<(), Error> {
 
     new_commands.push(LocalCommand {
         id: old_command.unwrap().id.clone(),
-        content: command.content.unwrap_or(old_command.unwrap().content.clone()),
-        description: command.description.unwrap_or(old_command.unwrap().description.clone()),
-        labels: command.labels.unwrap_or(old_command.unwrap().labels.clone()),
+        content: command
+            .content
+            .unwrap_or(old_command.unwrap().content.clone()),
+        description: command
+            .description
+            .unwrap_or(old_command.unwrap().description.clone()),
+        labels: command
+            .labels
+            .unwrap_or(old_command.unwrap().labels.clone()),
         created_at: old_command.unwrap().created_at.clone(),
         updated_at: chrono::Utc::now().to_rfc3339(),
         installed: old_command.unwrap().installed.clone(),
@@ -113,6 +118,6 @@ pub fn ammend(content: String, command: PartialCommand) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn search() -> Result<Vec<LocalCommand>, Error>{
+pub fn search() -> Result<Vec<LocalCommand>, Error> {
     unimplemented!()
 }
