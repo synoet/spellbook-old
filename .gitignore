@@ -1,4 +1,4 @@
-/api/node_modules
-/api/.env
-/cli/target
-
+/web/node_modules
+/web/.env
+/cli/node_modules
+.DSStore
