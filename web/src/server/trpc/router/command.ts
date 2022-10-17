@@ -9,16 +9,22 @@ export const commandRouter = router({
       z.object({
         content: z.string(),
         description: z.string(),
-
+        labels: z.array(z.string()).optional().default([])
       })
     )
     .mutation(async ({ input }): Promise<Command> => {
-      return await prisma.command.create(
+      const command = await prisma.command.create(
         {
           data: {
-            ...input
+            content: input.content,
+            description: input.description,
+            labels: {
+              create: input.labels.map((label) => ({ content: label })),
+            }
           },
       })
+
+      return command;
     }),
     getCommands: publicProcedure
     .input(
@@ -27,16 +33,27 @@ export const commandRouter = router({
       })
     )
     .query(async ({input}): Promise<Array<Command>> => {
+      const includes = {
+        include: {
+          labels: true
+        }
+      }
       const searchQuery = (input.query && input.query !== "") ?  {
         where: {
-          content: {
-            search: input.query,
-          },
-          description: {
-            search: input.query,
-          }
-        }} : {}
-      return await prisma.command.findMany(searchQuery as any);
+          OR: {
+            content: {
+              search: input.query,
+            },
+            description: {
+              search: input.query,
+            },
+         }
+        }, 
+        ...includes
+      } : {...includes}
+      return await prisma.command.findMany(
+        searchQuery as any
+      );
     }),
     deleteCommand: publicProcedure
     .input(z.object({
@@ -49,23 +66,4 @@ export const commandRouter = router({
         }
       })
     }),
-    searchCommands: publicProcedure
-    .input(
-      z.object({
-        query: z.string()
-      })
-    )
-    .query(async ({input}) => {
-      return await prisma.command.findMany({
-        where: {
-          content: {
-            search: input.query,
-          },
-          description: {
-            search: input.query,
-          }
-        }
-      })
-
-    })
 });
