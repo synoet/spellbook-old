@@ -1,6 +1,6 @@
 import { router, publicProcedure } from "../trpc";
 import { Command } from "@prisma/client";
-import {prisma} from '../../db/client';
+import { prisma } from "../../db/client";
 import { z } from "zod";
 
 export const commandRouter = router({
@@ -15,12 +15,12 @@ export const commandRouter = router({
         private: z.boolean().optional().default(false),
       })
     )
-    .mutation(async ({ input, ctx}): Promise<Command | undefined> => {
+    .mutation(async ({ input, ctx }): Promise<Command | undefined> => {
       const { session } = ctx;
 
       if (!session?.user) return undefined;
 
-      const {user} = session;
+      const { user } = session;
 
       return await prisma.command.create({
         data: {
@@ -32,52 +32,53 @@ export const commandRouter = router({
           private: input.private,
           user: {
             connect: {
-              id: user.id
-            }
+              id: user.id,
+            },
           },
           recipe: {
             connect: {
-              id: input.recipeId
-            }
+              id: input.recipeId,
+            },
           },
           team: {
             connect: {
-              id: input.teamId
-            }
-          }
-        }
-      })
+              id: input.teamId,
+            },
+          },
+        },
+      });
     }),
-    getPublicCommands: publicProcedure
+  getPublicCommands: publicProcedure
     .input(
       z.object({
         query: z.string().optional(),
       })
     )
-    .query(async ({input}): Promise<Array<Command>> => {
+    .query(async ({ input }): Promise<Array<Command>> => {
       const includes = {
         include: {
-          labels: true
-        }
-      }
-      const searchQuery = (input.query && input.query !== "") ?  {
-        where: {
-          OR: {
-            content: {
-              search: input.query,
-            },
-            description: {
-              search: input.query,
-            },
-         }
-        }, 
-        ...includes
-      } : {...includes}
-      return await prisma.command.findMany(
-        searchQuery as any
-      );
+          labels: true,
+        },
+      };
+      const searchQuery =
+        input.query && input.query !== ""
+          ? {
+              where: {
+                OR: {
+                  content: {
+                    search: input.query,
+                  },
+                  description: {
+                    search: input.query,
+                  },
+                },
+              },
+              ...includes,
+            }
+          : { ...includes };
+      return await prisma.command.findMany(searchQuery as any);
     }),
-    addToRecipe: publicProcedure
+  addToRecipe: publicProcedure
     .input(
       z.object({
         commandId: z.string(),
@@ -92,13 +93,13 @@ export const commandRouter = router({
         data: {
           recipe: {
             connect: {
-              id: input.recipeId
-            }
-          }
-        }
-      })
+              id: input.recipeId,
+            },
+          },
+        },
+      });
     }),
-    addToTeam: publicProcedure
+  addToTeam: publicProcedure
     .input(
       z.object({
         commandId: z.string(),
@@ -113,10 +114,10 @@ export const commandRouter = router({
         data: {
           team: {
             connect: {
-              id: input.teamId
-            }
-          }
-        }
-      })
+              id: input.teamId,
+            },
+          },
+        },
+      });
     }),
 });

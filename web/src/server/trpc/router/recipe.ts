@@ -1,6 +1,6 @@
 import { router, publicProcedure } from "../trpc";
 import { Recipe } from "@prisma/client";
-import {prisma} from '../../db/client';
+import { prisma } from "../../db/client";
 import { z } from "zod";
 
 export const recipeRouter = router({
@@ -12,12 +12,12 @@ export const recipeRouter = router({
         teamId: z.string().optional(),
       })
     )
-    .mutation(async ({ input, ctx}): Promise<Recipe | undefined> => {
+    .mutation(async ({ input, ctx }): Promise<Recipe | undefined> => {
       const { session } = ctx;
 
       if (!session?.user) return;
 
-      const {user} = session;
+      const { user } = session;
 
       return await prisma.recipe.create({
         data: {
@@ -25,15 +25,15 @@ export const recipeRouter = router({
           private: input.private,
           user: {
             connect: {
-              id: user.id
-            }
+              id: user.id,
+            },
           },
           team: {
             connect: {
-              id: input.teamId
-            }
-          }
-        }
-      })
+              id: input.teamId,
+            },
+          },
+        },
+      });
     }),
 });

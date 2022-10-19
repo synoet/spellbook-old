@@ -12,15 +12,14 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: env.GITHUB_ID,
       clientSecret: env.GITHUB_SECRET,
-    })
+    }),
   ],
   callbacks: {
-    session: async ({ session, user}) => {
+    session: async ({ session, user }) => {
       session && (session.user = user);
-      return session
+      return session;
     },
-
-  }
+  },
 };
 
 export default NextAuth(authOptions);

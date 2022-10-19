@@ -1,12 +1,11 @@
-import React from 'react';
+import React from "react";
 
 const Navbar = () => {
   return (
-    <div className="w-full text-white flex">
-      <h1 className="font-semibold text-white text-xl"> Spellbook </h1>
-
+    <div className="flex w-full text-white">
+      <h1 className="text-xl font-semibold text-white"> Spellbook </h1>
     </div>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
