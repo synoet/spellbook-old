@@ -15,35 +15,38 @@ export const commandRouter = router({
         private: z.boolean().optional().default(false),
       })
     )
-    .mutation(async ({ input }): Promise<Command> => {
-      const createInput: any = {
+    .mutation(async ({ input, ctx}): Promise<Command | undefined> => {
+      const { session } = ctx;
+
+      if (!session?.user) return undefined;
+
+      const {user} = session;
+
+      return await prisma.command.create({
         data: {
           content: input.content,
           description: input.description,
           labels: {
-            create: input.labels.map((label) => ({ label })),
+            create: input.labels.map((label) => ({ content: label })),
           },
           private: input.private,
-        }
-      }
-
-      if (input.recipeId) {
-        createInput.data.recipe = {
-          connect: {
-            id: input.recipeId
+          user: {
+            connect: {
+              id: user.id
+            }
+          },
+          recipe: {
+            connect: {
+              id: input.recipeId
+            }
+          },
+          team: {
+            connect: {
+              id: input.teamId
+            }
           }
         }
-      }
-
-      if (input.teamId){
-        createInput.data.team = {
-          connect: {
-            id: input.teamId
-          }
-        }
-      }
-
-      return await prisma.command.create(createInput)
+      })
     }),
     getPublicCommands: publicProcedure
     .input(
@@ -73,5 +76,47 @@ export const commandRouter = router({
       return await prisma.command.findMany(
         searchQuery as any
       );
+    }),
+    addToRecipe: publicProcedure
+    .input(
+      z.object({
+        commandId: z.string(),
+        recipeId: z.string(),
+      })
+    )
+    .mutation(async ({ input }): Promise<Command | undefined> => {
+      return await prisma.command.update({
+        where: {
+          id: input.commandId,
+        },
+        data: {
+          recipe: {
+            connect: {
+              id: input.recipeId
+            }
+          }
+        }
+      })
+    }),
+    addToTeam: publicProcedure
+    .input(
+      z.object({
+        commandId: z.string(),
+        teamId: z.string(),
+      })
+    )
+    .mutation(async ({ input }): Promise<Command | undefined> => {
+      return await prisma.command.update({
+        where: {
+          id: input.commandId,
+        },
+        data: {
+          team: {
+            connect: {
+              id: input.teamId
+            }
+          }
+        }
+      })
     }),
 });

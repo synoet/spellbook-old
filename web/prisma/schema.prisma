@@ -89,8 +89,7 @@ model User {
   sessions      Session[]
   commands     Command[]
   recipes     Recipe[]
-  team        Team?     @relation(fields: [teamId], references: [id])
-  teamId      String?
+  teams       Team[]
 }
 
 model Team {

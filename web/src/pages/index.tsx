@@ -15,7 +15,7 @@ const Home: NextPage = () => {
     labels: []
   });
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const {data: commandData, refetch: refetchCommands} = trpc.command.getCommands.useQuery({query: searchQuery});
+  const {data: commandData, refetch: refetchCommands} = trpc.command.getPublicCommands.useQuery({query: searchQuery});
 
   const {mutate: createCommand} = trpc.command.createCommand.useMutation({
     onSuccess: async () => {
