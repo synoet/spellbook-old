@@ -9,24 +9,43 @@ export const commandRouter = router({
       z.object({
         content: z.string(),
         description: z.string(),
-        labels: z.array(z.string()).optional().default([])
+        labels: z.array(z.string()).optional().default([]),
+        recipeId: z.string().optional(),
+        teamId: z.string().optional(),
+        private: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input }): Promise<Command> => {
-      const command = await prisma.command.create(
-        {
-          data: {
-            content: input.content,
-            description: input.description,
-            labels: {
-              create: input.labels.map((label) => ({ content: label })),
-            }
+      const createInput: any = {
+        data: {
+          content: input.content,
+          description: input.description,
+          labels: {
+            create: input.labels.map((label) => ({ label })),
           },
-      })
+          private: input.private,
+        }
+      }
 
-      return command;
+      if (input.recipeId) {
+        createInput.data.recipe = {
+          connect: {
+            id: input.recipeId
+          }
+        }
+      }
+
+      if (input.teamId){
+        createInput.data.team = {
+          connect: {
+            id: input.teamId
+          }
+        }
+      }
+
+      return await prisma.command.create(createInput)
     }),
-    getCommands: publicProcedure
+    getPublicCommands: publicProcedure
     .input(
       z.object({
         query: z.string().optional(),
@@ -54,16 +73,5 @@ export const commandRouter = router({
       return await prisma.command.findMany(
         searchQuery as any
       );
-    }),
-    deleteCommand: publicProcedure
-    .input(z.object({
-      id: z.number()
-    }))
-    .mutation(async ({ input }): Promise<Command> => {
-      return await prisma.command.delete({
-        where: {
-          id: input.id
-        }
-      })
     }),
 });

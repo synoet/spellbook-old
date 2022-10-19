@@ -1,10 +1,14 @@
 import React, {useState, useEffect} from 'react';
+
+import { useSession } from 'next-auth/react';
 import type { NextPage } from "next";
 import { trpc } from "../utils/trpc";
 
 import Navbar from '../components/Navbar'
 
 const Home: NextPage = () => {
+  const session = useSession();
+  console.log(session);
   const [newCommand, setNewCommand] = useState<any>({
     content: "",
     description: "",
