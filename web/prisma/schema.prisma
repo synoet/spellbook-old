@@ -29,10 +29,32 @@ model Command {
   @@fulltext([content, description])
 }
 
+model Snippet {
+  id          String      @id @default(cuid())
+  content    String   @db.VarChar(255)
+  description String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  private     Boolean  @default(false)
+  labels      Label[]
+  recipe      Recipe?  @relation(fields: [recipeId], references: [id])
+  recipeId    String?
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  team        Team?     @relation(fields: [teamId], references: [id])
+  teamId      String?
+
+  @@fulltext([content])
+  @@fulltext([description])
+  @@fulltext([content, description])
+}
+
 model Label {
   id        String      @id @default(cuid())
   content   String   @db.VarChar(255)
   Command   Command? @relation(fields: [commandId], references: [id])
+  Snippet  Snippet? @relation(fields: [snippetId], references: [id])
+  snippetId String?
   commandId String?
 
   @@index([commandId])
@@ -46,6 +68,7 @@ model Recipe {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   commands  Command[]
+  snippets Snippet[]
   user     User?     @relation(fields: [userId], references: [id])
   userId   String?
   team    Team?     @relation(fields: [teamId], references: [id])
@@ -83,11 +106,13 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
+  username      String?   @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
   commands     Command[]
+  snippets   Snippet[]
   recipes     Recipe[]
   teams       Team[]
 }
@@ -98,6 +123,7 @@ model Team {
   members   User[]
   commands Command[]
   recipes Recipe[]
+  snippets Snippet[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

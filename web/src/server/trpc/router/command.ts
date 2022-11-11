@@ -3,6 +3,8 @@ import { Command } from "@prisma/client";
 import { prisma } from "../../db/client";
 import { z } from "zod";
 
+import {get} from '../services/command.service'
+
 export const commandRouter = router({
   createCommand: publicProcedure
     .input(
@@ -35,16 +37,6 @@ export const commandRouter = router({
               id: user.id,
             },
           },
-          recipe: {
-            connect: {
-              id: input.recipeId,
-            },
-          },
-          team: {
-            connect: {
-              id: input.teamId,
-            },
-          },
         },
       });
     }),
@@ -55,28 +47,7 @@ export const commandRouter = router({
       })
     )
     .query(async ({ input }): Promise<Array<Command>> => {
-      const includes = {
-        include: {
-          labels: true,
-        },
-      };
-      const searchQuery =
-        input.query && input.query !== ""
-          ? {
-              where: {
-                OR: {
-                  content: {
-                    search: input.query,
-                  },
-                  description: {
-                    search: input.query,
-                  },
-                },
-              },
-              ...includes,
-            }
-          : { ...includes };
-      return await prisma.command.findMany(searchQuery as any);
+      return await get(input.query)
     }),
   addToRecipe: publicProcedure
     .input(
