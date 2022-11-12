@@ -80,6 +80,7 @@ model Recipe {
 
 model Link {
   id          String   @id @default(cuid())
+  linkId      String   @db.VarChar(255)
   title       String   @db.VarChar(255)
   type        String   @db.VarChar(255)
   content     String   @db.Text()

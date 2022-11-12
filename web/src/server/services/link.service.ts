@@ -28,8 +28,19 @@ export const create = async ({
       user: {
         connect: {
           id: userId,
-        }
-      }
+        },
+      },
     },
+  });
+};
+
+export const getOne = async (id: string): Promise<any | null> => {
+  return await prisma.link.findMany({
+    where: {
+      linkId: id,
+    },
+    include: {
+      user: true,
+    }
   });
 };
