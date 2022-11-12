@@ -33,6 +33,7 @@ model Snippet {
   id          String      @id @default(cuid())
   content    String   @db.VarChar(255)
   description String   @db.VarChar(255)
+  language    String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   private     Boolean  @default(false)
