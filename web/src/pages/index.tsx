@@ -39,6 +39,7 @@ const Home: NextPage = () => {
         <CreateSnippet
           open={createSnippetOpen}
           setOpen={setCreateSnippetOpen}
+          refetchSnippets={() => refetchSnippets()}
         />
 
         <div className="flex w-full items-center justify-between">

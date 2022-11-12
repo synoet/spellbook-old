@@ -29,7 +29,7 @@ export default function Select({
       {({ open }) => (
         <>
           {label && (
-            <Listbox.Label className="block text-sm font-medium text-gray-300">
+            <Listbox.Label className="block text-sm font-medium text-gray-700">
               {label}
             </Listbox.Label>
           )}

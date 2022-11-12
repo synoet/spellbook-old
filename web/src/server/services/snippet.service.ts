@@ -12,6 +12,7 @@ interface GetSnippetsParams {
 }
 
 interface CreateSnippetsParams {
+  title: string;
   content: string;
   description: string;
   language: string;
@@ -90,6 +91,7 @@ export const get = async ({
 };
 
 export const create = async ({
+  title,
   content,
   description,
   language,
@@ -101,6 +103,7 @@ export const create = async ({
 }: CreateSnippetsParams): Promise<Snippet> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {
+    title: title,
     content: content,
     private: isPrivate,
     description: description,

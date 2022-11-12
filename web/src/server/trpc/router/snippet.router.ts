@@ -7,6 +7,7 @@ export const snippetRouter = router({
   create: publicProcedure
     .input(
       z.object({
+        title: z.string(),
         content: z.string(),
         description: z.string(),
         language: z.string(),
@@ -20,6 +21,7 @@ export const snippetRouter = router({
       const { session } = ctx;
 
       const {
+        title,
         content,
         description,
         language,
@@ -34,6 +36,7 @@ export const snippetRouter = router({
       const { user } = session;
 
       return await create({
+        title: title,
         content: content,
         description: description,
         language: language,

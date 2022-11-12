@@ -23,8 +23,11 @@ const CodeEditor = ({ content, setContent, language }: CodeEditorProps): JSX.Ele
       theme={githubDark}
       extensions={[javascript({ jsx: true})]}
       placeholder="Write your code here"
+      height="400px"
       editable={true}
       style={{
+        minHeight: '300px',
+        borderRadius: '10px',
       }}
     />
   )

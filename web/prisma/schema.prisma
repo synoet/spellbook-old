@@ -10,7 +10,7 @@ generator client {
 }
 
 model Command {
-  id          String      @id @default(cuid())
+  id          String   @id @default(cuid())
   content     String   @db.VarChar(255)
   description String   @db.VarChar(255)
   createdAt   DateTime @default(now())
@@ -21,7 +21,7 @@ model Command {
   recipeId    String?
   user        User     @relation(fields: [userId], references: [id])
   userId      String
-  team        Team?     @relation(fields: [teamId], references: [id])
+  team        Team?    @relation(fields: [teamId], references: [id])
   teamId      String?
 
   @@fulltext([content])
@@ -30,9 +30,10 @@ model Command {
 }
 
 model Snippet {
-  id          String      @id @default(cuid())
-  content    String   @db.VarChar(255)
-  description String   @db.VarChar(255)
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  content     String   @db.Text()
+  description String   @db.VarChar(500)
   language    String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -42,19 +43,20 @@ model Snippet {
   recipeId    String?
   user        User     @relation(fields: [userId], references: [id])
   userId      String
-  team        Team?     @relation(fields: [teamId], references: [id])
+  team        Team?    @relation(fields: [teamId], references: [id])
   teamId      String?
 
+  @@fulltext([title])
   @@fulltext([content])
   @@fulltext([description])
-  @@fulltext([content, description])
+  @@fulltext([title,content, description])
 }
 
 model Label {
-  id        String      @id @default(cuid())
+  id        String   @id @default(cuid())
   content   String   @db.VarChar(255)
   Command   Command? @relation(fields: [commandId], references: [id])
-  Snippet  Snippet? @relation(fields: [snippetId], references: [id])
+  Snippet   Snippet? @relation(fields: [snippetId], references: [id])
   snippetId String?
   commandId String?
 
@@ -63,32 +65,32 @@ model Label {
 }
 
 model Recipe {
-  id        String       @id @default(cuid())
+  id        String    @id @default(cuid())
   title     String    @db.VarChar(255)
   private   Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   commands  Command[]
-  snippets Snippet[]
-  user     User?     @relation(fields: [userId], references: [id])
-  userId   String?
-  team    Team?     @relation(fields: [teamId], references: [id])
-  teamId  String?
+  snippets  Snippet[]
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+  team      Team?     @relation(fields: [teamId], references: [id])
+  teamId    String?
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -112,21 +114,21 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  commands     Command[]
-  snippets   Snippet[]
-  recipes     Recipe[]
-  teams       Team[]
+  commands      Command[]
+  snippets      Snippet[]
+  recipes       Recipe[]
+  teams         Team[]
 }
 
 model Team {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   members   User[]
-  commands Command[]
-  recipes Recipe[]
-  snippets Snippet[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  commands  Command[]
+  recipes   Recipe[]
+  snippets  Snippet[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model VerificationToken {
