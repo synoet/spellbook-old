@@ -2,7 +2,7 @@ import { router, publicProcedure } from "../trpc";
 import { Snippet } from "@prisma/client";
 import { z } from "zod";
 
-import { get, create } from "../services/snippet.service";
+import { get, create } from "../../services/snippet.service";
 
 export const snippetRouter = router({
   create: publicProcedure

@@ -1,19 +1,21 @@
-import { Command } from "@prisma/client";
-import { prisma } from "../../db/client";
+import { Snippet } from "@prisma/client";
+import { prisma } from "../db/client";
 
-interface GetCommandsParams {
-  searchQuery?: string | undefined;
-  userId?: string | undefined;
-  teamId?: string | undefined;
-  from?: Date | undefined;
-  to?: Date | undefined;
-  limit?: number | undefined;
+interface GetSnippetsParams {
+  searchQuery?: string;
+  userId?: string;
+  teamId?: string;
+  from?: Date;
+  to?: Date;
+  limit?: number;
   includePrivate?: boolean;
 }
 
-interface CreateCommandsParams {
+interface CreateSnippetsParams {
   content: string;
   description: string;
+  language: string;
+  isPrivate?: boolean;
   labels: Array<string>;
   userId: string;
   recipeId?: string;
@@ -28,7 +30,7 @@ export const get = async ({
   to,
   limit,
   includePrivate,
-}: GetCommandsParams): Promise<Array<Command>> => {
+}: GetSnippetsParams): Promise<Array<Snippet>> => {
   const includes = {
     include: {
       labels: true,
@@ -84,21 +86,25 @@ export const get = async ({
     query.limit = limit;
   }
 
-  return await prisma.command.findMany(query);
+  return await prisma.snippet.findMany(query);
 };
 
 export const create = async ({
   content,
   description,
+  language,
+  isPrivate,
   labels,
   userId,
   recipeId,
   teamId,
-}: CreateCommandsParams): Promise<Command> => {
+}: CreateSnippetsParams): Promise<Snippet> => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: any = {
     content: content,
+    private: isPrivate,
     description: description,
+    language: language,
     labels: {
       create: labels.map((label) => ({ content: label })),
     },
@@ -125,5 +131,5 @@ export const create = async ({
     };
   }
 
-  return await prisma.command.create({ data: data });
+  return await prisma.snippet.create({ data: data });
 };

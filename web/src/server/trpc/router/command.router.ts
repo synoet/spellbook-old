@@ -2,7 +2,7 @@ import { router, publicProcedure } from "../trpc";
 import { Command } from "@prisma/client";
 import { z } from "zod";
 
-import { get, create } from "../services/command.service";
+import { get, create } from "../../services/command.service";
 
 export const commandRouter = router({
   create: publicProcedure
