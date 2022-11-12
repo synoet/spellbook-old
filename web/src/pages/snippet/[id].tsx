@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { trpc } from "../../utils/trpc";
@@ -20,13 +20,28 @@ const Snippet: NextPage = () => {
     { enabled: !!id }
   );
 
+  const { mutate: createLink } = trpc.link.create.useMutation();
+
   const { data: session } = useSession();
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
+  const handleCopyLink = (linkId: string) => {
+    createLink({
+      id: linkId,
+      content: snippet?.content || "None",
+      title: snippet?.title || "Untitled",
+      type: "snippet",
+    });
+  };
+
   return (
     <Layout>
-      <Share open={shareModalOpen} setOpen={setShareModalOpen}/>
+      <Share
+        open={shareModalOpen}
+        setOpen={setShareModalOpen}
+        onCopy={handleCopyLink}
+      />
       <div className="flex min-h-screen w-[1200px] flex-col space-y-4 rounded-md p-4">
         {snippet && (
           <PageHeader
@@ -45,7 +60,9 @@ const Snippet: NextPage = () => {
                 name: snippet?.title,
               },
             ]}
-            shareCallback={() => {setShareModalOpen(true)}}
+            shareCallback={() => {
+              setShareModalOpen(true);
+            }}
           />
         )}
         {snippet && (
