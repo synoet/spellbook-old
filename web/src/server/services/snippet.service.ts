@@ -90,6 +90,14 @@ export const get = async ({
   return await prisma.snippet.findMany(query);
 };
 
+export const getOne = async (id: string): Promise<Snippet | null> => {
+  return await prisma.snippet.findUnique({
+    where: {
+      id: id,
+    }
+  });
+}
+
 export const create = async ({
   title,
   content,

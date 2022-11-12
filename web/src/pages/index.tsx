@@ -59,14 +59,13 @@ const Home: NextPage = () => {
             </button>
           </div>
         </div>
-        <div className="overflow-hidden rounded-md border border-gray-300/10 bg-gray-900/50">
-          <ul role="list" className="divide-y divide-gray-800">
-            {commands &&
-              commands.map((command) => (
-                <CommandItem command={command} key={command.id} />
-              ))}
-          </ul>
-        </div>
+        <ul role="list" className="space-y-4">
+          {commands &&
+            commands.map((command) => (
+              <CommandItem command={command} key={command.id} />
+            ))}
+        </ul>
+        <br />
         <div className="flex w-full items-center justify-between">
           <h1 className="text-2xl font-bold">Snippets</h1>
           <div className="flex items-center space-x-6">
@@ -83,14 +82,12 @@ const Home: NextPage = () => {
             </button>
           </div>
         </div>
-        <div className="overflow-hidden rounded-md border border-gray-300/10 bg-gray-900/50">
-          <ul role="list" className="divide-y divide-gray-800">
-            {snippets &&
-              snippets.map((snippet) => (
-                <SnippetItem snippet={snippet} key={snippet.id} />
-              ))}
-          </ul>
-        </div>
+        <ul role="list" className="space-y-4">
+          {snippets &&
+            snippets.map((snippet) => (
+              <SnippetItem snippet={snippet} key={snippet.id} />
+            ))}
+        </ul>
       </div>
     </Layout>
   );

@@ -1,7 +1,7 @@
 import { router, publicProcedure } from "../trpc";
 import { Snippet } from "@prisma/client";
 import { z } from "zod";
-import { get, create } from "../../services/snippet.service";
+import { get, getOne, create } from "../../services/snippet.service";
 
 export const snippetRouter = router({
   create: publicProcedure
@@ -57,5 +57,14 @@ export const snippetRouter = router({
       return await get({
         searchQuery: input.query,
       });
+    }),
+  getOne: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ input }): Promise<Snippet | null> => {
+      return await getOne(input.id);
     }),
 });

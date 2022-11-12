@@ -49,7 +49,7 @@ model Snippet {
   @@fulltext([title])
   @@fulltext([content])
   @@fulltext([description])
-  @@fulltext([title,content, description])
+  @@fulltext([title, content, description])
 }
 
 model Label {
@@ -76,6 +76,19 @@ model Recipe {
   userId    String?
   team      Team?     @relation(fields: [teamId], references: [id])
   teamId    String?
+}
+
+model Link {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  type        String   @db.VarChar(255)
+  content     String   @db.VarChar(255)
+  description String   @db.VarChar(255)
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+  notes       String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  visibility  String   @db.VarChar(255)
 }
 
 model Account {
@@ -116,6 +129,7 @@ model User {
   sessions      Session[]
   commands      Command[]
   snippets      Snippet[]
+  links         Link[]
   recipes       Recipe[]
   teams         Team[]
 }

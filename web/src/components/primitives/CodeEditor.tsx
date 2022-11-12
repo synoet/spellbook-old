@@ -11,11 +11,12 @@ import { javascript } from '@codemirror/lang-javascript'
 
 interface CodeEditorProps {
   content: string;
-  setContent: () => any;
+  setContent?: () => any;
   language: any;
+  readonly: boolean;
 }
 
-const CodeEditor = ({ content, setContent, language }: CodeEditorProps): JSX.Element => {
+const CodeEditor = ({ content, setContent, language, readonly = false}: CodeEditorProps): JSX.Element => {
   return (
     <CodeMirror
       value={content}
@@ -23,8 +24,7 @@ const CodeEditor = ({ content, setContent, language }: CodeEditorProps): JSX.Ele
       theme={githubDark}
       extensions={[javascript({ jsx: true})]}
       placeholder="Write your code here"
-      height="400px"
-      editable={true}
+      editable={!readonly}
       style={{
         minHeight: '300px',
         borderRadius: '10px',
