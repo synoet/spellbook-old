@@ -6,6 +6,7 @@ import { trpc } from "../utils/trpc";
 import { useSession } from "next-auth/react";
 
 import CommandItem from "../components/CommandItem";
+import SnippetItem from "../components/SnippetItem";
 
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
@@ -84,9 +85,9 @@ const Home: NextPage = () => {
         </div>
         <div className="overflow-hidden rounded-md border border-gray-300/10 bg-gray-900/50">
           <ul role="list" className="divide-y divide-gray-800">
-            {commands &&
-              commands.map((command) => (
-                <CommandItem command={command} key={command.id} />
+            {snippets &&
+              snippets.map((snippet) => (
+                <SnippetItem snippet={snippet} key={snippet.id} />
               ))}
           </ul>
         </div>
