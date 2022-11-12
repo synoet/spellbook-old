@@ -5,6 +5,7 @@ import { Switch } from '@headlessui/react'
 
 import { trpc } from '../utils/trpc';
 
+
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -31,7 +32,7 @@ const CreateCommand = ({ open, setOpen, refetchCommands }: any) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-75 transition-opacity" />
+          <div className="fixed inset-0 bg-black bg-opacity-90 transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
