@@ -62,6 +62,7 @@ const PageHeader = ({
         </div>
         <div className="mt-4 flex flex-shrink-0 md:mt-0 md:ml-4">
           <button
+            onClick={editCallback}
             type="button"
             className="inline-flex items-center rounded-md border border-transparent bg-gray-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
@@ -69,6 +70,7 @@ const PageHeader = ({
           </button>
           <button
             type="button"
+            onClick={shareCallback}
             className="ml-3 inline-flex items-center rounded-md border border-transparent bg-indigo-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
           >
             Share

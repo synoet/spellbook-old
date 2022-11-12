@@ -35,7 +35,7 @@ const Modal = ({ title, open, setOpen, children}: any) => {
               <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-gray-900 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 w-[1000px] sm:p-6 text-white">
                 <div>
                   <div className="mt-3 sm:mt-5 flex flex-col space-y-4">
-                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-200">
+                    <Dialog.Title as="h3" className="text-2xl font-bold leading-6 text-gray-200">
                       {title}
                     </Dialog.Title>
                   </div>

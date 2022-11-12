@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { trpc } from "../../utils/trpc";
@@ -6,7 +6,7 @@ import { trpc } from "../../utils/trpc";
 import Layout from "../../components/Layout";
 import PageHeader from "../../components/primitives/PageHeader";
 import CodeEditor from "../../components/primitives/CodeEditor";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import Share from "../../components/Share";
 
 import { useSession } from "next-auth/react";
 
@@ -15,15 +15,18 @@ const Snippet: NextPage = () => {
 
   const id = router.query.id as string;
 
-  const { data: snippet, isLoading } = trpc.snippet.getOne.useQuery(
+  const { data: snippet } = trpc.snippet.getOne.useQuery(
     { id: id },
     { enabled: !!id }
   );
 
   const { data: session } = useSession();
 
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+
   return (
     <Layout>
+      <Share open={shareModalOpen} setOpen={setShareModalOpen}/>
       <div className="flex min-h-screen w-[1200px] flex-col space-y-4 rounded-md p-4">
         {snippet && (
           <PageHeader
@@ -42,6 +45,7 @@ const Snippet: NextPage = () => {
                 name: snippet?.title,
               },
             ]}
+            shareCallback={() => {setShareModalOpen(true)}}
           />
         )}
         {snippet && (
