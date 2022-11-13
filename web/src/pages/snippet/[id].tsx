@@ -20,27 +20,18 @@ const Snippet: NextPage = () => {
     { enabled: !!id }
   );
 
-  const { mutate: createLink } = trpc.link.create.useMutation();
 
   const { data: session } = useSession();
 
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  const handleCopyLink = (linkId: string) => {
-    createLink({
-      id: linkId,
-      content: snippet?.content || "None",
-      title: snippet?.title || "Untitled",
-      type: "snippet",
-    });
-  };
 
   return (
     <Layout>
       <Share
+        snippet={snippet}
         open={shareModalOpen}
         setOpen={setShareModalOpen}
-        onCopy={handleCopyLink}
       />
       <div className="flex min-h-screen w-[1200px] flex-col space-y-4 rounded-md p-4">
         {snippet && (

@@ -10,8 +10,8 @@ import Layout from '../../../components/Layout';
 const Link: NextPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
-  console.log(id)
   const {data: link} = trpc.link.getOne.useQuery({id: id}, {enabled: !!id});
+  console.log(link?.user.username)
   return (
     <Layout>
       <div className="flex min-h-screen w-[1200px] flex-col space-y-4 rounded-md p-4">
@@ -21,6 +21,12 @@ const Link: NextPage = () => {
             readonly={true}
           />
         )}
+        <div className="w-full flex items-center justify-center">
+          {link && (
+            <p className="text-gray-400">{link.type} by <span className="text-indigo-500 font-bold">{link.user.username}</span></p>
+          )}
+        </div>
+
       </div>
     </Layout>
   )

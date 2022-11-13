@@ -7,7 +7,7 @@ export const linkRouter = router({
   create: publicProcedure
     .input(
       z.object({
-        id: z.string(),
+        linkId: z.string(),
         title: z.string(),
         content: z.string(),
         type: z.string(),
@@ -16,14 +16,14 @@ export const linkRouter = router({
     .mutation(async ({ input, ctx }): Promise<Link | undefined> => {
       const { session } = ctx;
 
-      const { id, title, content, type } = input;
+      const { linkId, title, content, type } = input;
 
       if (!session?.user) return undefined;
 
       const { user } = session;
 
       return await create({
-        linkId: id,
+        linkId: linkId,
         title: title,
         content: content,
         type: type,

@@ -1,10 +1,37 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Modal from "../components/primitives/Modal";
 import { EnvelopeIcon } from "@heroicons/react/20/solid";
 import cuid from "cuid";
 
-const Share = ({ open, setOpen, onCopy }: any): JSX.Element => {
-  const linkId = cuid();
+import { trpc } from "../utils/trpc";
+import {Snippet, Command} from '@prisma/client'
+
+
+interface ShareProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  snippet?: Snippet
+  command?: Command
+}
+
+const Share = ({ open, setOpen, onCopy, snippet}: ShareProps ): JSX.Element => {
+
+  const { mutate: createLink } = trpc.link.create.useMutation();
+
+
+  const handleCopyLink = (linkId: string) => {
+    createLink({
+      linkId: linkId,
+      content: snippet?.content || "None",
+      title: snippet?.title || "Untitled",
+      type: "snippet",
+    });
+  };
+
+  const linkId = useMemo(() => {
+    return cuid();
+  }, []);
+
   return (
     <Modal title={"Share"} open={open} setOpen={setOpen}>
       <div className="mt-8 flex flex-col space-y-4 pb-12">
@@ -58,7 +85,7 @@ const Share = ({ open, setOpen, onCopy }: any): JSX.Element => {
             />
           </div>
           <button
-            onClick={() => onCopy(linkId)}
+            onClick={() => handleCopyLink(linkId)}
             className="mt-3 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
           >
             Copy

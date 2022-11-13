@@ -26,7 +26,6 @@ const CodeEditor = ({ content, setContent, language, readonly = false}: CodeEdit
       placeholder="Write your code here"
       editable={!readonly}
       style={{
-        minHeight: '300px',
         borderRadius: '10px',
       }}
     />

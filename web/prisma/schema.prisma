@@ -79,15 +79,15 @@ model Recipe {
 }
 
 model Link {
-  id          String   @id @default(cuid())
-  linkId      String   @db.VarChar(255)
-  title       String   @db.VarChar(255)
-  type        String   @db.VarChar(255)
-  content     String   @db.Text()
-  user        User?    @relation(fields: [userId], references: [id])
-  userId      String?
-  createdAt   DateTime @default(now())
-  visibility  String   @db.VarChar(255)
+  id         String   @id @default(cuid())
+  linkId     String   @db.VarChar(255) @unique
+  title      String   @db.VarChar(255)
+  type       String   @db.VarChar(255)
+  content    String   @db.Text()
+  user       User?    @relation(fields: [userId], references: [id])
+  userId     String?
+  createdAt  DateTime @default(now())
+  visibility String   @db.VarChar(255)
 }
 
 model Account {

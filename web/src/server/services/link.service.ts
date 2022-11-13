@@ -2,7 +2,7 @@ import { Link } from "@prisma/client";
 import { prisma } from "../db/client";
 
 interface CreateLinkParams {
-  id: string;
+  linkId: string;
   content: string;
   title: string;
   userId: string;
@@ -11,7 +11,7 @@ interface CreateLinkParams {
 }
 
 export const create = async ({
-  id,
+  linkId,
   content,
   title,
   userId,
@@ -20,7 +20,7 @@ export const create = async ({
 }: CreateLinkParams): Promise<Link> => {
   return await prisma.link.create({
     data: {
-      id: id,
+      linkId: linkId ,
       title: title,
       type: type,
       visibility: visibility,
@@ -28,16 +28,16 @@ export const create = async ({
       user: {
         connect: {
           id: userId,
-        },
-      },
+        }
+      }
     },
   });
 };
 
-export const getOne = async (id: string): Promise<any | null> => {
-  return await prisma.link.findMany({
+export const getOne = async (linkId: string): Promise<Link | null> => {
+  return await prisma.link.findUnique({
     where: {
-      linkId: id,
+      linkId: linkId,
     },
     include: {
       user: true,
