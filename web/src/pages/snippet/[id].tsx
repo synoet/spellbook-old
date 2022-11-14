@@ -33,7 +33,6 @@ const Snippet: NextPage = () => {
         open={shareModalOpen}
         setOpen={setShareModalOpen}
       />
-      <div className="flex min-h-screen w-[1200px] flex-col space-y-4 rounded-md p-4">
         {snippet && (
           <PageHeader
             title={snippet?.title}
@@ -66,7 +65,6 @@ const Snippet: NextPage = () => {
             />
           </div>
         )}
-      </div>
     </Layout>
   );
 };

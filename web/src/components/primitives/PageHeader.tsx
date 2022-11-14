@@ -22,7 +22,7 @@ const PageHeader = ({
   return (
     <div>
       <div>
-        <nav className="mt-12 hidden sm:flex" aria-label="Breadcrumb">
+        <nav className="hidden sm:flex" aria-label="Breadcrumb">
           <ol role="list" className="flex items-center space-x-4">
             {backlinks.map(({ href, name }, index) => (
               <li key={href}>
