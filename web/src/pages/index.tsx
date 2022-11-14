@@ -27,68 +27,66 @@ const Home: NextPage = () => {
 
   return (
     <Layout>
-      <div className="flex min-h-screen w-[1200px] flex-col space-y-4 rounded-md p-4">
-        <h1 className="font-bold">
-          Welcome Back,{" "}
-          <span className="text-indigo-400">{session?.user.username}</span>
-        </h1>
-        <CreateCommand
-          open={createCommandOpen}
-          setOpen={setCreateCommandOpen}
-          refetchCommands={() => refetchCommands()}
-        />
-        <CreateSnippet
-          open={createSnippetOpen}
-          setOpen={setCreateSnippetOpen}
-          refetchSnippets={() => refetchSnippets()}
-        />
+      <h1 className="font-bold">
+        Welcome Back,{" "}
+        <span className="text-indigo-400">{session?.user.username}</span>
+      </h1>
+      <CreateCommand
+        open={createCommandOpen}
+        setOpen={setCreateCommandOpen}
+        refetchCommands={() => refetchCommands()}
+      />
+      <CreateSnippet
+        open={createSnippetOpen}
+        setOpen={setCreateSnippetOpen}
+        refetchSnippets={() => refetchSnippets()}
+      />
 
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-2xl font-bold">Commands</h1>
-          <div className="flex items-center space-x-6">
-            <ArrowPathIcon
-              onClick={() => refetchCommands()}
-              className="h-[25px] w-[25px] cursor-pointer text-gray-300 hover:text-gray-100"
-            />
-            <button
-              onClick={() => setCreateCommandOpen(true)}
-              className="flex items-center space-x-1 text-gray-300 hover:text-gray-100"
-            >
-              <PlusCircleIcon className="h-[25px] w-[25px]" />
-              <p>Add Command</p>
-            </button>
-          </div>
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-2xl font-bold">Commands</h1>
+        <div className="flex items-center space-x-6">
+          <ArrowPathIcon
+            onClick={() => refetchCommands()}
+            className="h-[25px] w-[25px] cursor-pointer text-gray-300 hover:text-gray-100"
+          />
+          <button
+            onClick={() => setCreateCommandOpen(true)}
+            className="flex items-center space-x-1 text-gray-300 hover:text-gray-100"
+          >
+            <PlusCircleIcon className="h-[25px] w-[25px]" />
+            <p>Add Command</p>
+          </button>
         </div>
-        <ul role="list" className="space-y-4">
-          {commands &&
-            commands.map((command) => (
-              <CommandItem command={command} key={command.id} />
-            ))}
-        </ul>
-        <br />
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-2xl font-bold">Snippets</h1>
-          <div className="flex items-center space-x-6">
-            <ArrowPathIcon
-              onClick={() => refetchCommands()}
-              className="h-[25px] w-[25px] cursor-pointer text-gray-300 hover:text-gray-100"
-            />
-            <button
-              onClick={() => setCreateSnippetOpen(true)}
-              className="flex items-center space-x-1 text-gray-300 hover:text-gray-100"
-            >
-              <PlusCircleIcon className="h-[25px] w-[25px]" />
-              <p>Add Snippet</p>
-            </button>
-          </div>
-        </div>
-        <ul role="list" className="space-y-4">
-          {snippets &&
-            snippets.map((snippet) => (
-              <SnippetItem snippet={snippet} key={snippet.id} />
-            ))}
-        </ul>
       </div>
+      <ul role="list" className="space-y-4">
+        {commands &&
+          commands.map((command) => (
+            <CommandItem command={command} key={command.id} />
+          ))}
+      </ul>
+      <br />
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-2xl font-bold">Snippets</h1>
+        <div className="flex items-center space-x-6">
+          <ArrowPathIcon
+            onClick={() => refetchCommands()}
+            className="h-[25px] w-[25px] cursor-pointer text-gray-300 hover:text-gray-100"
+          />
+          <button
+            onClick={() => setCreateSnippetOpen(true)}
+            className="flex items-center space-x-1 text-gray-300 hover:text-gray-100"
+          >
+            <PlusCircleIcon className="h-[25px] w-[25px]" />
+            <p>Add Snippet</p>
+          </button>
+        </div>
+      </div>
+      <ul role="list" className="space-y-4">
+        {snippets &&
+          snippets.map((snippet) => (
+            <SnippetItem snippet={snippet} key={snippet.id} />
+          ))}
+      </ul>
     </Layout>
   );
 };

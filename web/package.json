@@ -24,6 +24,7 @@
     "@types/codemirror": "^5.60.5",
     "@uiw/codemirror-theme-github": "^4.13.2",
     "@uiw/react-codemirror": "^4.13.2",
+    "clsx": "^1.2.1",
     "codemirror": "^6.0.1",
     "cuid": "^2.1.8",
     "heroicons": "^2.0.12",

@@ -15,7 +15,7 @@ const CreateCommand = ({ open, setOpen, refetchCommands }: any) => {
   const [content, setContent] = useState('')
   const [description, setDescription] = useState('')
   const [labels, setLabels] = useState('')
-  const { mutate: createCommand } = trpc.command.createCommand.useMutation({onSuccess: async () => {
+  const { mutate: createCommand } = trpc.command.create.useMutation({onSuccess: async () => {
     refetchCommands()
     setOpen(false);
   }});
