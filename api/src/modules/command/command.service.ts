@@ -1,5 +1,5 @@
 import prisma from "../../utils/prisma";
-import { CreateCommandSchema } from "./command.schema";
+import { CreateCommandSchema, GetAllCommandsSchema } from "./command.schema";
 
 export const createCommand = async (command: CreateCommandSchema) => {
   return await prisma.command.create({
@@ -32,4 +32,35 @@ export const createCommand = async (command: CreateCommandSchema) => {
       }),
     },
   } as any);
+};
+
+export const getAllCommands = async (query: GetAllCommandsSchema) => {
+  return await prisma.command.findMany({
+    where: {
+      ...(query.ids && {
+        id: {
+          in: query.ids,
+        },
+      }),
+      ...(query.labels && {
+        labels: {
+          some: {
+            content: {
+              in: query.labels,
+            },
+          },
+        },
+      }),
+      ...(query.q && {
+        OR: {
+          content: {
+            search: query.q,
+          },
+          description: {
+            search: query.q,
+          },
+        },
+      }),
+    },
+  });
 };

@@ -1,6 +1,13 @@
 import { FastifyInstance } from "fastify";
-import { createCommandHandler } from "./command.controller";
-import { $ref, CreateCommandSchema } from "./command.schema";
+import {
+  createCommandHandler,
+  getAllCommandsHandler,
+} from "./command.controller";
+import {
+  $ref,
+  CreateCommandSchema,
+  GetAllCommandsSchema,
+} from "./command.schema";
 
 const commandRoutes = async (server: FastifyInstance) => {
   server.post<{
@@ -16,6 +23,21 @@ const commandRoutes = async (server: FastifyInstance) => {
       },
     },
     createCommandHandler
+  );
+
+  server.get<{
+    Querystring: GetAllCommandsSchema;
+  }>(
+    "/",
+    {
+      schema: {
+        querystring: $ref("getAllCommandsSchema"),
+        response: {
+          200: $ref("getAllCommandsResponseSchema"),
+        },
+      },
+    },
+    getAllCommandsHandler
   );
 };
 
