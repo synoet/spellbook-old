@@ -1,4 +1,6 @@
 /web/node_modules
 /web/.env
+/api/node_modules
+/api/.env
 /cli/node_modules
 .DSStore
