@@ -64,3 +64,17 @@ export const getAllCommands = async (query: GetAllCommandsSchema) => {
     },
   });
 };
+
+export const getCommand = async (id: string) => {
+  return await prisma.command.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      labels: true,
+      user: true,
+      team: true,
+      recipe: true,
+    }
+  });
+};

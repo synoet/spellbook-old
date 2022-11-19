@@ -2,11 +2,13 @@ import { FastifyInstance } from "fastify";
 import {
   createCommandHandler,
   getAllCommandsHandler,
+  getCommandHandler,
 } from "./command.controller";
 import {
   $ref,
   CreateCommandSchema,
   GetAllCommandsSchema,
+  GetCommandSchema,
 } from "./command.schema";
 
 const commandRoutes = async (server: FastifyInstance) => {
@@ -39,6 +41,10 @@ const commandRoutes = async (server: FastifyInstance) => {
     },
     getAllCommandsHandler
   );
+
+  server.get<{
+    Params: GetCommandSchema;
+  }>("/:id", {}, getCommandHandler);
 };
 
 export default commandRoutes;

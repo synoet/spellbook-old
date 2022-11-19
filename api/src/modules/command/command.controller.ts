@@ -1,10 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import {
   CreateCommandSchema,
-  CreateCommandResponseSchema,
   GetAllCommandsSchema,
+  GetCommandSchema,
 } from "./command.schema";
-import { createCommand, getAllCommands } from "./command.service";
+import { createCommand, getAllCommands, getCommand } from "./command.service";
 
 export const createCommandHandler = async (
   req: FastifyRequest<{ Body: CreateCommandSchema }>,
@@ -29,4 +29,16 @@ export const getAllCommandsHandler = async (
     commands: response,
     facets: req.query,
   });
+};
+
+export const getCommandHandler = async (
+  req: FastifyRequest<{ Params: GetCommandSchema }>,
+  rep: FastifyReply
+) => {
+  const command = await getCommand(req.params.id).catch((e) => {
+    console.error(e);
+    rep.status(500).send("Error Getting Command");
+  });
+
+  rep.status(200).send(command);
 };
