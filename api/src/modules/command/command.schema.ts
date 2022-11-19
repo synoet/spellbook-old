@@ -1,6 +1,6 @@
-import { Command, Label} from "@prisma/client";
 import { z } from "zod";
 import { buildJsonSchemas } from "fastify-zod";
+import { CommandSchema } from "../../../prisma/zod";
 
 const createCommandSchema = z.object({
   content: z
@@ -27,8 +27,32 @@ const createCommandSchema = z.object({
   teamId: z.string().optional(),
 });
 
+const createCommandResponseSchema = CommandSchema;
+
 export type CreateCommandSchema = z.infer<typeof createCommandSchema>;
+export type CreateCommandResponseSchema = z.infer<
+  typeof createCommandResponseSchema
+>;
+
+const getAllCommandsSchema = z.object({
+  ids: z.array(z.string()).max(20).optional(),
+  q: z.string().optional(),
+  labels: z.array(z.string()).optional(),
+});
+
+const getAllCommandsResponseSchema = z.object({
+  facets: getAllCommandsSchema,
+  commands: z.array(CommandSchema),
+});
+
+export type GetAllCommandsSchema = z.infer<typeof getAllCommandsSchema>;
+export type GetAllCommandsResponseSchema = z.infer<
+  typeof getAllCommandsResponseSchema
+>;
 
 export const { schemas: commandSchemas, $ref } = buildJsonSchemas({
   createCommandSchema,
+  createCommandResponseSchema,
+  getAllCommandsSchema,
+  getAllCommandsResponseSchema,
 });

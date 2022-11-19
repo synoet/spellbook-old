@@ -1,21 +1,22 @@
-import { FastifyInstance } from 'fastify';
-import {
-  $ref,
-  CreateCommandSchema,
-} from './command.schema'
+import { FastifyInstance } from "fastify";
+import { createCommandHandler } from "./command.controller";
+import { $ref, CreateCommandSchema } from "./command.schema";
 
-
-const userRoutes = async (server: FastifyInstance) => {
+const commandRoutes = async (server: FastifyInstance) => {
   server.post<{
-    Body: CreateCommandSchema,
-  }
-  >('/', {
-    schema: {
-      body: $ref.createCommandSchema,
+    Body: CreateCommandSchema;
+  }>(
+    "/",
+    {
+      schema: {
+        body: $ref("createCommandSchema"),
+        response: {
+          201: $ref("createCommandResponseSchema"),
+        },
+      },
+    },
+    createCommandHandler
+  );
+};
 
-    }
-  })
-
-}
-
-export default userRoutes;
+export default commandRoutes;

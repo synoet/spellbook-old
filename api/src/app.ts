@@ -1,20 +1,19 @@
-import Fastify from 'fastify';
-
-import userRoutes from './modules/command/command.route';
-
+import Fastify from "fastify";
+import { attachCommandRoutes } from "./modules/command";
 const server = Fastify();
 
-server.get('/health', async (req, res) => {
-  return {status: 'OK'}
+server.get("/health", async (req, res) => {
+  return { status: "OK" };
 });
 
+attachCommandRoutes(server);
 
-async function main(){
-  server.register(userRoutes, {prefix: '/api/users'})
-  await server.listen({port: 5000}).catch((e) => {
+
+async function main() {
+  await server.listen({ port: 5000 }).catch((e) => {
     console.error(e);
     process.exit(1);
-  })
+  });
 }
 
 main();

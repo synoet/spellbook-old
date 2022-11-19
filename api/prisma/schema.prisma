@@ -10,14 +10,9 @@ generator client {
 }
 
 generator zod {
-  provider                 = "zod-prisma"
-  output                   = "./zod" // (default) the directory where generated zod schemas will be saved
-  relationModel            = true // (default) Create and export both plain and related models.
-  modelCase                = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
-  modelSuffix              = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
-  useDecimalJs             = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
-  imports                  = null // (default) will import the referenced file in generated schemas to be used via imports.someExportedVariable
-  prismaJsonNullability    = true // (default) uses prisma's scheme for JSON field nullability
+  provider    = "zod-prisma"
+  output      = "./zod"
+  modelSuffix = "Schema"
 }
 
 model Command {
@@ -91,7 +86,7 @@ model Recipe {
 
 model Link {
   id         String   @id @default(cuid())
-  linkId     String   @db.VarChar(255) @unique
+  linkId     String   @unique @db.VarChar(255)
   title      String   @db.VarChar(255)
   type       String   @db.VarChar(255)
   content    String   @db.Text()

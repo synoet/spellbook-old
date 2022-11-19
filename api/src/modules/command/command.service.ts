@@ -5,15 +5,17 @@ export const createCommand = async (command: CreateCommandSchema) => {
   return await prisma.command.create({
     data: {
       content: command.content,
-      description: command.description,
-      labels: command.labels,
-      ...(command.userId && {
-        user: {
-          connect: {
-            id: command.userId,
-          },
+      ...(command.description && { description: command.description }),
+      ...(command.labels && {
+        labels: {
+          create: command.labels.map((label) => ({ content: label })),
         },
       }),
+      user: {
+        connect: {
+          id: command.userId,
+        },
+      },
       ...(command.recipeId && {
         recipe: {
           connect: {
@@ -29,5 +31,5 @@ export const createCommand = async (command: CreateCommandSchema) => {
         },
       }),
     },
-  });
+  } as any);
 };
