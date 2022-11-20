@@ -10,7 +10,7 @@ attachCommandRoutes(server);
 
 
 async function main() {
-  await server.listen({ port: 5000 }).catch((e) => {
+  await server.listen({ port: 5000, host: "0.0.0.0"}).catch((e) => {
     console.error(e);
     process.exit(1);
   });
