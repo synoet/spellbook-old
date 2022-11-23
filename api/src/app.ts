@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import { attachCommandRoutes } from "./modules/command";
+import { attachSnippetRoutes } from "./modules/snippet";
 const server = Fastify();
 
 server.get("/health", async (req, res) => {
@@ -7,6 +8,7 @@ server.get("/health", async (req, res) => {
 });
 
 attachCommandRoutes(server);
+attachSnippetRoutes(server);
 
 
 async function main() {
