@@ -17,23 +17,17 @@ export const callbackHandler = async (
   const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
   const response = await axios
-    .post(
-      "https://github.com/login/oauth/access_token",
-      {
-        client_id: clientId,
-        client_secret: clientSecret,
-        code: code,
-      },
-      {
-        headers: {
-          accept: "application/json",
-        },
-      }
-    )
+    .post("https://github.com/login/oauth/access_token", {
+      client_id: clientId,
+      client_secret: clientSecret,
+      code: code,
+    })
     .catch((e: Error) => {
       console.error(e);
       return rep.status(500).send("Error Getting Access Token");
     });
 
+
+  const { access_token } = response.data;
   return rep.status(200).send("OK");
 };
