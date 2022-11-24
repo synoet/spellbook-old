@@ -1,22 +1,18 @@
 import * as z from "zod"
-import { CompleteAccount, RelatedAccountSchema, CompleteSession, RelatedSessionSchema, CompleteCommand, RelatedCommandSchema, CompleteSnippet, RelatedSnippetSchema, CompleteLink, RelatedLinkSchema, CompleteRecipe, RelatedRecipeSchema, CompleteTeam, RelatedTeamSchema } from "./index"
+import { CompleteCommand, RelatedCommandSchema, CompleteSnippet, RelatedSnippetSchema, CompleteRecipe, RelatedRecipeSchema, CompleteLink, RelatedLinkSchema, CompleteTeam, RelatedTeamSchema } from "./index"
 
 export const UserSchema = z.object({
   id: z.string(),
-  name: z.string().nullish(),
-  email: z.string().nullish(),
-  username: z.string().nullish(),
-  emailVerified: z.date().nullish(),
-  image: z.string().nullish(),
+  username: z.string(),
+  profileImage: z.string(),
+  githubId: z.string().nullish(),
 })
 
 export interface CompleteUser extends z.infer<typeof UserSchema> {
-  accounts: CompleteAccount[]
-  sessions: CompleteSession[]
   commands: CompleteCommand[]
   snippets: CompleteSnippet[]
-  links: CompleteLink[]
   recipes: CompleteRecipe[]
+  links: CompleteLink[]
   teams: CompleteTeam[]
 }
 
@@ -26,11 +22,9 @@ export interface CompleteUser extends z.infer<typeof UserSchema> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const RelatedUserSchema: z.ZodSchema<CompleteUser> = z.lazy(() => UserSchema.extend({
-  accounts: RelatedAccountSchema.array(),
-  sessions: RelatedSessionSchema.array(),
   commands: RelatedCommandSchema.array(),
   snippets: RelatedSnippetSchema.array(),
-  links: RelatedLinkSchema.array(),
   recipes: RelatedRecipeSchema.array(),
+  links: RelatedLinkSchema.array(),
   teams: RelatedTeamSchema.array(),
 }))
