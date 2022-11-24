@@ -1,19 +1,19 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { UserToken } from "./auth.schema";
+import { FastifyRequest } from "fastify";
 
-export const createAuthToken = (user: UserToken) => {
+export const createAuthToken = (id: string) => {
   const expires = new Date();
   expires.setHours(expires.getHours() + 24);
   return jwt.sign(
-    { ...user, expires: expires },
+    { id, expires: expires },
     process.env.JWT_SECRET as string,
     { algorithm: "HS256" }
   );
 };
 
-export const getAuthToken = (req: any) => {
-  return req.headers.token | req.cookies.token;
+export const getAuthToken = (req: FastifyRequest): string  => {
+  return req.headers.token as string;
 };
 
 export const getGithubProfile = async (accessToken: string) => {

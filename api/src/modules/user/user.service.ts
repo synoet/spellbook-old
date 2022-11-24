@@ -18,10 +18,10 @@ export const getUserByGithubId = async (githubId: string) => {
   });
 };
 
-export const getUser = async ({ id }: any) => {
+export const getUser = async (id: string) => {
   return await prisma.user.findUnique({
     where: {
-      id,
+      id: id,
     },
   });
 };
