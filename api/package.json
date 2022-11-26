@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev ./src/app.ts",
+    "dev": "ts-node-dev --watch=./src ./src/app.ts",
     "build": "tsc -p ./tsconfig.json",
     "start": "node ./dist/app.js"
   },

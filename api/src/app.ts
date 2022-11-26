@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import { attachCommandRoutes } from "./modules/command";
 import { attachSnippetRoutes } from "./modules/snippet";
 import { attachAuthRoutes } from "./modules/auth";
+import { attachTeamRoutes } from "./modules/team";
 const server = Fastify();
 
 server.get("/health", async (req, res) => {
@@ -11,6 +12,7 @@ server.get("/health", async (req, res) => {
 attachAuthRoutes(server);
 attachCommandRoutes(server);
 attachSnippetRoutes(server);
+attachTeamRoutes(server);
 
 async function main() {
   await server.listen({ port: 5000, host: "0.0.0.0"}).catch((e) => {
