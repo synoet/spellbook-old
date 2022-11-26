@@ -8,7 +8,7 @@ import {
 import { createUser, getUserByGithubId, getUser } from "../user/user.service";
 import jwt from "jsonwebtoken";
 
-export const authHandler = async (req: FastifyRequest, rep: FastifyReply) => {
+export const authHandler = async (_: FastifyRequest, rep: FastifyReply) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
   rep.redirect(
     `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`
