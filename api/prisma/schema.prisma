@@ -35,6 +35,7 @@ model Command {
   @@fulltext([content, description])
 }
 
+
 model Snippet {
   id          String   @id @default(cuid())
   title       String   @db.VarChar(255)
