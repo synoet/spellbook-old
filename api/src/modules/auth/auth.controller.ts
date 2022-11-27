@@ -8,8 +8,14 @@ import {
 import { createUser, getUserByGithubId, getUser } from "../user/user.service";
 import jwt from "jsonwebtoken";
 
-export const authHandler = async (_: FastifyRequest, rep: FastifyReply) => {
+export const authHandler = async (
+  req: FastifyRequest<{ Querystring: { src: string } }>,
+  rep: FastifyReply
+) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
+  const { src } = req.query;
+  console.log(src)
+  rep.setCookie("spellbook_auth_source", src);
   rep.redirect(
     `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`
   );
@@ -20,6 +26,8 @@ export const callbackHandler = async (
   rep: FastifyReply
 ) => {
   const { code }: { code: string } = req.query;
+
+  const src = req.cookies.spellbook_auth_source;
 
   const access_token = await handleGithubCallback(code).catch((err) => {
     console.log(err);
@@ -47,6 +55,12 @@ export const callbackHandler = async (
   }
 
   const token = createAuthToken(user.id);
+
+  if (src === "web") {
+    if (process.env.NODE_ENV !== "production") {
+      rep.redirect("http://localhost:3000/auth/callback?token=" + token);
+    }
+  }
 
   return rep.status(200).send({
     status: "success",

@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/cookie": "^8.3.0",
     "@prisma/client": "^4.6.1",
     "@types/axios": "^0.14.0",
     "@types/jsonwebtoken": "^8.5.9",
