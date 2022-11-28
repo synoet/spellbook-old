@@ -5,9 +5,11 @@ import { attachSnippetRoutes } from "./modules/snippet";
 import { attachAuthRoutes } from "./modules/auth";
 import { attachTeamRoutes } from "./modules/team";
 import { attachLanguageRoutes } from "./modules/language";
-const server = Fastify();
+import cors from "@fastify/cors";
+const server = Fastify({ logger: true });
 
 server.register(cookie);
+server.register(cors, {});
 
 server.get("/health", async (req, res) => {
   return { status: "OK" };

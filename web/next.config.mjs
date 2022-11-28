@@ -21,4 +21,12 @@ export default defineNextConfig({
     locales: ["en"],
     defaultLocale: "en",
   },
+  async rewrites() {
+    return [
+     {
+        source: "/api/:path*",
+        destination: `http://localhost:5000/api/:path*`,
+      },
+    ];
+  },
 });

@@ -13,7 +13,7 @@ export const createAuthToken = (id: string) => {
 };
 
 export const getAuthToken = (req: FastifyRequest): string  => {
-  return req.headers.token as string;
+  return req.cookies.spellbook_auth_token as string;
 };
 
 export const getGithubProfile = async (accessToken: string) => {

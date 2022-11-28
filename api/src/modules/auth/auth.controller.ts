@@ -14,7 +14,6 @@ export const authHandler = async (
 ) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
   const { src } = req.query;
-  console.log(src)
   rep.setCookie("spellbook_auth_source", src);
   rep.redirect(
     `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user`
@@ -56,21 +55,27 @@ export const callbackHandler = async (
 
   const token = createAuthToken(user.id);
 
+  rep.setCookie("spellbook_auth_token", token, {
+    httpOnly: true,
+  });
+
   if (src === "web") {
     if (process.env.NODE_ENV !== "production") {
-      rep.redirect("http://localhost:3000/auth/callback?token=" + token);
+      // if the source is the web then we can redirect to the redirect page.
+      rep.redirect("http://localhost:3000/");
+      return rep;
     }
   }
 
   return rep.status(200).send({
     status: "success",
-    token: token,
     user: user,
   });
 };
 
 export const whoamiHandler = async (req: FastifyRequest, rep: FastifyReply) => {
   const token = getAuthToken(req);
+  console.log(token);
 
   if (!token) {
     return rep.status(401).send("Unauthorized");
