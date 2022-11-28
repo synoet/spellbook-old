@@ -9,7 +9,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     // simple redirect if session is unathenticated
     if (status === "unauthenticated" && !isSessionLoading) {
-      window.location.href = "http://localhost:3000/sigin";
+      window.location.href = "http://localhost:3000/auth/signin";
     }
   }, [session, isSessionLoading, status]);
 

@@ -17,7 +17,7 @@ export default function useSession() {
   useEffect(() => {
     const cookies = new Cookies();
     const token = cookies.get("spellbook_auth_token");
-    if (!!token) {
+    if (!!!token) {
       setStatus("unauthenticated");
       setIsSessionLoading(false);
     } else {

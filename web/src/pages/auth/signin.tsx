@@ -2,7 +2,7 @@ import React from "react";
 import type { NextPage } from "next";
 import Image from "next/image";
 
-export default function SignInPage(): NextPage {
+export default function SignInPage(): JSX.Element {
   return (
     <div className="flex flex-col items-center space-y-4 sm:mx-auto sm:w-full sm:max-w-md">
       <Image
