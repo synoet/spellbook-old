@@ -4,4 +4,5 @@
 /api/.env
 /api/dist
 /cli/node_modules
+/infra/node_modules
 .DSStore
