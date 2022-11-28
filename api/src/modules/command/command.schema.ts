@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { buildJsonSchemas } from "fastify-zod";
-import { CommandSchema, LabelSchema, UserSchema, RecipeSchema, TeamSchema} from "../../../prisma/zod";
+import { CommandSchema, LabelSchema, UserSchema, RecipeSchema, TeamSchema} from "../../prisma/zod";
 
 const createCommandSchema = z.object({
   content: z

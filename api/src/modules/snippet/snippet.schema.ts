@@ -6,7 +6,7 @@ import {
   RecipeSchema,
   TeamSchema,
   LabelSchema,
-} from "../../../prisma/zod";
+} from "../../prisma/zod";
 
 export const createSnippetSchema = z.object({
   title: z.string(),
